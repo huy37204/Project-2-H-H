@@ -84,6 +84,34 @@ string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
     }
     return oss.str();
 }
+Date createDate(vector <BYTE> main_entry)
+{
+    vector <BYTE> bigedian_date(2);
+    for (int i = 0; i <= 1; i++)
+    {
+        bigedian_date[i] = main_entry[0x10 + 1 - i];
+    }
+    Date d;
+    d.year =  1980 + ((bigedian_date[0] & 0xFE) >> 1);
+    d.month = ((bigedian_date[0]) & 0x01) << 3 | ((bigedian_date[1] & 0xE0) >> 5);
+    d.day = (bigedian_date[1]) & 0x1F;
+    return d;
+}
+Time createTime(vector <BYTE> main_entry)
+{
+    vector <BYTE> bigedian_time(3);
+    for (int i = 0; i <= 2; i++)
+    {
+        bigedian_time[i] = main_entry[0x0D + 2 - i];
+    }
+    Time t;
+    t.hour = (bigedian_time[0] >> 3) & 0x1F;
+    t.minute = ((bigedian_time[0] & 0x07) << 3) | ((bigedian_time[1] >> 5) & 0x07);
+    t.second = ((bigedian_time[1] & 0x1F) << 1 )| ((bigedian_time[2] >> 7) & 0x01);
+    t.milisecond = (bigedian_time[2] & 0x7F);
+
+    return t;
+}
 
 void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
 {
@@ -105,6 +133,12 @@ void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
             CloseHandle(hDrive);
             return;
         }
+        for (int i = 0; i < bytesRead; ++i) {
+        wcout << hex << setw(2) << setfill(L'0') << (int)rdet[i] << L" ";
+        if ((i + 1) % 16 == 0) {
+            wcout << endl;
+            }
+        }
         int start_byte = 0; // Cho vong lap chay 32 byte cho moi vong lap
         vector <vector <BYTE>> extra_entry;
         vector <BYTE> main_entry;
@@ -121,8 +155,32 @@ void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
             {
                 copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
                 string name = createName(extra_entry, main_entry);
-                cout << name << endl;
-                MyPC.root_Drives[ith_drive]->setName(name);
+                Date d = createDate(main_entry);
+                Time t = createTime(main_entry);
+                int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
+                long long total_size = main_entry[0x1C] | (main_entry[0x1C + 1] << 8) | (main_entry[0x1C + 2] << 16) | (main_entry[0x1C + 3] << 24);
+                if (attribute == 0x20)
+                {
+                    File* newFile = new File;
+                    newFile->setName(name);
+                    newFile->setDate(d);
+                    newFile->setTime(t);
+                    newFile->add_cluster_pos(started_cluster);
+                    newFile->setTotalSize(total_size);
+                    read_next_sector(newFile, MyPC.root_Drives[ith_drive], drivePath);
+                    MyPC.root_Drives[ith_drive]->addNewFile_Directory(newFile);
+                }
+                else
+                {
+                    Directory* newDirectory = new Directory;
+                    newDirectory->setName(name);
+                    newDirectory->setDate(d);
+                    newDirectory->setTime(t);
+                    newDirectory->add_cluster_pos(started_cluster);
+                    newDirectory->setTotalSize(total_size);
+                    read_next_sector(newDirectory, MyPC.root_Drives[ith_drive], drivePath);
+                    MyPC.root_Drives[ith_drive]->addNewFile_Directory(newDirectory);
+                }
                 extra_entry = vector <vector <BYTE>>{};
                 main_entry = vector <BYTE>{};
             }
@@ -131,32 +189,38 @@ void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
                 extra_entry = vector <vector <BYTE>>{};
             }
             else if (attribute == 0x00)
+            {
                 is_end = 1;
+            }
             start_byte += 32;
         }
     }
     CloseHandle(hDrive);
-   /* for (int i = 0; i < bytesRead; ++i) {
-        wcout << hex << setw(2) << setfill(L'0') << (int)rdet[i] << L" ";
-        if ((i + 1) % 16 == 0) {
-            wcout << endl;
-        }
-    }*/
+   
+}
 
-    /*HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+void read_next_sector(FileSystemEntity* f, Drive* dr, wstring drivePath)
+{
+    FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
+    HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
         cout << "Failed to open physical drive." << endl;
         return;
     }
-    SetFilePointer(hDrive, 0, NULL, FILE_BEGIN);
     DWORD bytesRead;
-    BYTE bootsector[512];
-    if (!ReadFile(hDrive, bootsector, sizeof(bootsector), &bytesRead, NULL)) {
+    SetFilePointer(hDrive, bs.byte_per_sector * (bs.sector_before_FAT_table), NULL, FILE_BEGIN);
+    BYTE* fat1 = new BYTE[bs.sector_per_FAT * bs.byte_per_sector];
+    if (!ReadFile(hDrive, fat1, sizeof(fat1), &bytesRead, NULL)) {
         wcerr << "Failed to read boot sector from physical drive." << endl;
         CloseHandle(hDrive);
         return;
-    }*/
+    }
+    while (true)
+    {
+        int cluster_pos = bs.byte_per_sector * (bs.sector_before_FAT_table + f->get_pos_cluster(0));
+    }
 }
+
 
 void read_FAT32_Drives(Computer& MyPC)
 {
@@ -170,7 +234,6 @@ void read_FAT32_Drives(Computer& MyPC)
 void detectFormat(Computer& MyPC)
 {
     GetRemovableDriveNames(MyPC);
-    string name;
     HANDLE hDrive = CreateFile(L"\\\\.\\PhysicalDrive1", GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
         cout << "Failed to open physical drive." << std::endl;

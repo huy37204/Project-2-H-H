@@ -7,6 +7,14 @@
 #include <sstream>
 using namespace std;
 
+struct Date
+{
+    int day, month, year;
+};
+struct Time
+{
+    int hour, minute, second, milisecond;
+};
 struct FAT32_BOOTSECTOR
 {
     int byte_per_sector;
@@ -21,17 +29,26 @@ class FileSystemEntity {
 protected:
     string name;
     string attributes;
-    string date_created;
-    double total_size;
+    Date date_created;
+    Time time_created;
+    vector <int> cluster_pos;
+    long long total_size;
 
 public:
     FileSystemEntity() = default;
 
-    virtual ~FileSystemEntity() {}
+    void setName(string name) { this->name = name; }
+    string getName() { return name; }
 
-    virtual void displayInfo() = 0; 
+    void setTime(Time t) { this->time_created = t; }
+    void setDate(Date d) { this->date_created = d; }
+    
+    void add_cluster_pos(int pos) { cluster_pos.push_back(pos); }
+    int get_pos_cluster(int index) { return cluster_pos[index]; }
 
-
+    void setTotalSize(int size) { this->total_size = size; }
+    long long getTotalSize() { return total_size; }
+    virtual void displayInfo() {};
 };
 
 
@@ -40,12 +57,18 @@ private:
 
 public:
     File() = default;
-
     void displayInfo() {
-   
+        cout << "File: " << getName() << "; ";
+        cout << "Date created: " << date_created.day << "/" << date_created.month << "/" << date_created.year << "; ";
+        cout << "Time created: " << time_created.hour << ":" << time_created.minute << ":" << time_created.second << ":" << time_created.milisecond << "; ";
+        cout << "Total size: " << total_size << "; ";
+        cout << "Cluster pos: ";
+        for (int i = 0; i < cluster_pos.size(); i++)
+        {
+            cout << cluster_pos[i] << "; ";
+        }
+        cout << endl;
     }
-
-
 };
 
 
@@ -60,7 +83,18 @@ public:
     }
 
     void displayInfo() {
+        cout << "Directory: " << getName() << "; ";
+        cout << "Date created: " << date_created.day << "/" << date_created.month << "/" << date_created.year << "; ";
+        cout << "Time created: " << time_created.hour << ":" << time_created.minute << ":" << time_created.second << ":" << time_created.milisecond << "; ";
+        cout << "Total size: " << total_size << "; ";
+        cout << "Cluster pos: ";
+        for (int i = 0; i < cluster_pos.size(); i++)
+        {
+            cout << cluster_pos[i] << ", ";
+        }
+        cout << endl;
     }
+    
     ~Directory()
     {
         for (int i = 0; i < contents.size(); i++)
@@ -74,7 +108,7 @@ private:
     string type;
     int started_byte_bootsector;
     int started_byte_rdet;
-    vector<FileSystemEntity*> rootDirectories;
+    vector<FileSystemEntity*> rootDirectories_Files;
     FAT32_BOOTSECTOR fat32bs;
 public:
     void set_fat32_bootsector(int byte_per_sector, int sector_per_cluster, int sector_before_FAT_table, int num_of_FAT_tables, int Volume_size, int sector_per_FAT, int first_cluster_of_RDET)
@@ -88,6 +122,8 @@ public:
         this->fat32bs.first_cluster_of_RDET = first_cluster_of_RDET;
         this->started_byte_rdet = (sector_per_FAT * num_of_FAT_tables + sector_before_FAT_table) * byte_per_sector ;
     }
+    FAT32_BOOTSECTOR getBootSectorIn4() { return fat32bs; }
+
     void setName(string name)
     {
         this->name = name;
@@ -104,10 +140,20 @@ public:
     }
     int getStartedByte() { return started_byte_bootsector; }
     int getStartedByteRDET() { return started_byte_rdet; }
+    void addNewFile_Directory(FileSystemEntity* f)
+    {
+        rootDirectories_Files.push_back(f);
+    }
+    void DisplayInfo()
+    {
+        cout << "Drive " << name << "\n";
+        for (int i = 0; i < rootDirectories_Files.size(); i++)
+            rootDirectories_Files[i]->displayInfo();
+    }
     ~Drive()
     {
-        for (int i = 0; i < rootDirectories.size(); i++)
-            delete rootDirectories[i];
+        for (int i = 0; i < rootDirectories_Files.size(); i++)
+            delete rootDirectories_Files[i];
     }
 };
 
@@ -127,3 +173,6 @@ void read_FAT32_Drives(Computer& MyPC);
 void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath);
 wstring stringToWideString(const string& str);
 string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry);
+Date createDate(vector <BYTE> main_entry);
+Time createTime(vector <BYTE> main_entry);
+void read_next_sector(FileSystemEntity* f, Drive dr, wstring drivePath);

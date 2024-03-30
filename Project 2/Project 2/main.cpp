@@ -10,5 +10,6 @@ int main() {
         cout << MyPC.root_Drives[i]->getStartedByte() << endl;
     }
     read_FAT32_Drives(MyPC);
+    MyPC.root_Drives[1]->DisplayInfo();
     return 0;
 }
