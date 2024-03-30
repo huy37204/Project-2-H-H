@@ -1,0 +1,5 @@
+﻿  function.cpp
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(66,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(109,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(222,23): warning C4018: '<': signed/unsigned mismatch
+  Project 2.vcxproj -> D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Debug\Project 2.exe
