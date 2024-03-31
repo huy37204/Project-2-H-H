@@ -1,3 +1,5 @@
+#ifndef FILESYSTEMENTITY_H
+#define FILESYSTEMENTITY_H
 #pragma once
 #include <iostream>
 #include <windows.h>
@@ -6,6 +8,8 @@
 #include <iomanip>
 #include <sstream>
 using namespace std;
+
+class Drive;
 
 struct Date
 {
@@ -25,6 +29,8 @@ struct FAT32_BOOTSECTOR
     int sector_per_FAT;
     int first_cluster_of_RDET;
 };
+
+
 class FileSystemEntity {
 protected:
     string name;
@@ -62,6 +68,9 @@ public:
         }
     }
 
+
+    void read_next_sector(Drive* dr, wstring drivePath);
+
     virtual void displayInfo() {};
 };
 
@@ -82,6 +91,10 @@ public:
             cout << cluster_pos[i] << "; ";
         }
         cout << endl;
+    }
+    void read_next_sector(Drive* dr, wstring drivePath)
+    {
+        FileSystemEntity::read_next_sector(dr, drivePath);
     }
 };
 
@@ -114,10 +127,29 @@ public:
         }
     }
 
+
     void addNewFile_Directory(FileSystemEntity* f)
     {
         contents.push_back(f);
     }
+
+    void read_next_sector(Drive* dr, wstring drivePath)
+    {
+        FileSystemEntity::read_next_sector(dr, drivePath);
+    }
+
+    void readData(Drive* dr, wstring drivePath)
+    {
+        readDirectoryData(dr, drivePath);
+        for (int i = 0; i < contents.size(); i++)
+        {
+            if (dynamic_cast<Directory*>(contents[i]))
+            {
+                static_cast<Directory*>(contents[i])->readData(dr, drivePath);
+            }
+        }
+    }
+    void readDirectoryData(Drive* dr, wstring drivePath);
 
     ~Directory()
     {
@@ -125,6 +157,8 @@ public:
             delete contents[i];
     }
 };
+
+
 
 class Drive {
 private:
@@ -174,6 +208,16 @@ public:
         for (int i = 0; i < rootDirectories_Files.size(); i++)
             rootDirectories_Files[i]->displayInfo();
     }
+    void readData(wstring drivePath)
+    {
+        for (int i = 0; i < rootDirectories_Files.size(); i++)
+        {
+            if (dynamic_cast<Directory*>(rootDirectories_Files[i]))
+            {
+                static_cast<Directory*>(rootDirectories_Files[i])->readData(this, drivePath);
+            }
+        }
+    }
     ~Drive()
     {
         for (int i = 0; i < rootDirectories_Files.size(); i++)
@@ -182,28 +226,41 @@ public:
 };
 
 class Computer {
-public:
+private:
     vector<Drive*> root_Drives;
+public:
     void addRootDrive(Drive*& d) {
         root_Drives.push_back(d);
     }
     void read_FAT32_Drives();
     void read_FAT32_BootSector(int ith_drive, wstring drivePath);
-    void read_FAT32_RDET_DATA(int ith_drive, wstring drivePath);
+    void read_FAT32_RDET(int ith_drive, wstring drivePath);
+    void detectFormat();
+    void GetRemovableDriveNames();
+    void DispayInfo()
+    {
+        for (int i = 0; i < root_Drives.size(); i++)
+        {
+            root_Drives[i]->DisplayInfo();
+        }
+    }
+    void readData(wstring drivePath)
+    {
+        for (int i = 0; i < root_Drives.size(); i++)
+        {
+            if (root_Drives[i]->getType() == "FAT32")
+            {
+                root_Drives[i]->readData(drivePath);
+            }
+        }
+    }
 };
 
 
 int littleEndianByteArrayToInt(const BYTE* byteArray, size_t length);
-void detectFormat(Computer& MyPC);
-void GetRemovableDriveNames(Computer& MyPC);
-void read_FAT32_BootSector(Computer& MyPC, int ith_drive, wstring drivePath);
-void read_FAT32_Drives(Computer& MyPC);
-void read_FAT32_RDET_DATA(Computer& MyPC, int ith_drive, wstring drivePath);
-void read_next_sector(FileSystemEntity* f, Drive* dr, wstring drivePath);
-void readDirectoryData(Directory*& directory, Drive* dr, wstring drivePath);
-
-
 wstring stringToWideString(const string& str);
 string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry);
 Date createDate(vector <BYTE> main_entry);
 Time createTime(vector <BYTE> main_entry);
+
+#endif

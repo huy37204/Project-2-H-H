@@ -1,15 +1,19 @@
 ﻿  function.cpp
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(59,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(80,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(105,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(111,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(65,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(89,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(118,27): warning C4018: '<': signed/unsigned mismatch
 D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(124,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(174,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(179,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(163,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(174,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(247,23): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(284,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(295,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(445,23): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(144,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(156,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(208,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(213,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(223,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(242,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(249,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(164,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(175,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(246,23): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(285,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(296,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(376,23): warning C4018: '<': signed/unsigned mismatch
   Project 2.vcxproj -> D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Debug\Project 2.exe
