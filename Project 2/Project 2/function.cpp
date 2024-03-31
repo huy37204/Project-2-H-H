@@ -113,7 +113,7 @@ Time createTime(vector <BYTE> main_entry)
     return t;
 }
 
-void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
+void read_FAT32_RDET_DATA(Computer& MyPC, int ith_drive, wstring drivePath)
 {
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
@@ -132,12 +132,6 @@ void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
             wcerr << "Failed to read boot sector from physical drive." << endl;
             CloseHandle(hDrive);
             return;
-        }
-        for (int i = 0; i < bytesRead; ++i) {
-        wcout << hex << setw(2) << setfill(L'0') << (int)rdet[i] << L" ";
-        if ((i + 1) % 16 == 0) {
-            wcout << endl;
-            }
         }
         int start_byte = 0; // Cho vong lap chay 32 byte cho moi vong lap
         vector <vector <BYTE>> extra_entry;
@@ -179,6 +173,7 @@ void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
                     newDirectory->add_cluster_pos(started_cluster);
                     newDirectory->setTotalSize(total_size);
                     read_next_sector(newDirectory, MyPC.root_Drives[ith_drive], drivePath);
+                    readDirectoryData(newDirectory, MyPC.root_Drives[ith_drive], drivePath);
                     MyPC.root_Drives[ith_drive]->addNewFile_Directory(newDirectory);
                 }
                 extra_entry = vector <vector <BYTE>>{};
@@ -187,6 +182,7 @@ void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath)
             else if ((attribute == 0x10 || attribute == 0x20) && rdet[start_byte] == 0xE5)
             {
                 extra_entry = vector <vector <BYTE>>{};
+                main_entry = vector <BYTE>{};
             }
             else if (attribute == 0x00)
             {
@@ -208,27 +204,191 @@ void read_next_sector(FileSystemEntity* f, Drive* dr, wstring drivePath)
         return;
     }
     DWORD bytesRead;
-    SetFilePointer(hDrive, bs.byte_per_sector * (bs.sector_before_FAT_table), NULL, FILE_BEGIN);
-    BYTE* fat1 = new BYTE[bs.sector_per_FAT * bs.byte_per_sector];
-    if (!ReadFile(hDrive, fat1, sizeof(fat1), &bytesRead, NULL)) {
-        wcerr << "Failed to read boot sector from physical drive." << endl;
-        CloseHandle(hDrive);
-        return;
-    }
+    int cluster_pos = f->get_pos_cluster(0) * 4;
+    BYTE* fat1 = new BYTE[bs.byte_per_sector * bs.sector_per_FAT];
     while (true)
     {
-        int cluster_pos = bs.byte_per_sector * (bs.sector_before_FAT_table + f->get_pos_cluster(0));
+        SetFilePointer(hDrive, bs.byte_per_sector * bs.sector_before_FAT_table, NULL, FILE_BEGIN);
+
+        if (!ReadFile(hDrive, fat1, bs.byte_per_sector * bs.sector_per_FAT, &bytesRead, NULL)) {
+            wcerr << "Failed to read FAT1 from physical drive." << endl;
+            CloseHandle(hDrive);
+            return;
+        }
+        bool is_empty = 1;
+        for (int i = 0; i < 4; i++)
+        {
+            int value = fat1[cluster_pos + i];
+            if (value != 0x00)
+                is_empty = 0;
+            if (!is_empty && value != 0xFF)
+                break;
+            if (value == 0xFF || value == 0xF7 || (value == 0x00 && is_empty))
+                return;
+        }
+        cluster_pos = fat1[cluster_pos] | (fat1[cluster_pos + 1] << 8) | (fat1[cluster_pos + 2] << 16) | (fat1[cluster_pos + 3] << 24);
+        f->add_cluster_pos(cluster_pos);
     }
+    delete[] fat1;
+}
+
+void readDirectoryData(Directory*& directory, Drive* dr, wstring drivePath)
+{
+    FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
+    vector <int> pos_cluster;
+    directory->getClusterPos(pos_cluster);
+    HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if (hDrive == INVALID_HANDLE_VALUE) {
+        cout << "Failed to open physical drive." << endl;
+        return;
+    }
+    DWORD bytesRead;
+    int bytes_per_cluster = bs.byte_per_sector * bs.sector_per_cluster;
+    for (int i = 0; i < pos_cluster.size(); i++)
+    {
+        int byte_cluster_pos = bs.byte_per_sector * (bs.sector_before_FAT_table + bs.num_of_FAT_tables * bs.sector_per_FAT + (pos_cluster[i] - bs.first_cluster_of_RDET) * bs.sector_per_cluster);
+        SetFilePointer(hDrive, byte_cluster_pos, NULL, FILE_BEGIN);
+        BYTE* data = new BYTE[bytes_per_cluster];
+        if (!ReadFile(hDrive, data, bytes_per_cluster, &bytesRead, NULL)) {
+            wcerr << "Failed to read boot sector from physical drive." << endl;
+            CloseHandle(hDrive);
+            return;
+        }
+        int start_byte = 64; // Cho vong lap chay 32 byte cho moi vong lap
+        vector <vector <BYTE>> extra_entry;
+        vector <BYTE> main_entry;
+        while (start_byte < bytes_per_cluster)
+        {
+            int attribute = data[start_byte + 0x0B]; //0-0-A-D-V-S-H-R
+            if (attribute == 0x0F)
+            {
+                vector<BYTE> temp_vec;
+                copy(&data[start_byte], &data[start_byte + 32], back_inserter(temp_vec)); // Doc 32 byte vao entry phu
+                extra_entry.push_back(temp_vec);
+            }
+            else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] != 0xE5)
+            {
+                copy(&data[start_byte], &data[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
+                string name = createName(extra_entry, main_entry);
+                Date d = createDate(main_entry);
+                Time t = createTime(main_entry);
+                int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
+                long long total_size = main_entry[0x1C] | (main_entry[0x1C + 1] << 8) | (main_entry[0x1C + 2] << 16) | (main_entry[0x1C + 3] << 24);
+                if (attribute == 0x20)
+                {
+                    File* newFile = new File;
+                    newFile->setName(name);
+                    newFile->setDate(d);
+                    newFile->setTime(t);
+                    newFile->add_cluster_pos(started_cluster);
+                    newFile->setTotalSize(total_size);
+                    read_next_sector(newFile, dr, drivePath);
+                    directory->addNewFile_Directory(newFile);
+                }
+                else
+                {
+                    Directory* newDirectory = new Directory;
+                    newDirectory->setName(name);
+                    newDirectory->setDate(d);
+                    newDirectory->setTime(t);
+                    newDirectory->add_cluster_pos(started_cluster);
+                    newDirectory->setTotalSize(total_size);
+                    read_next_sector(newDirectory, dr, drivePath);
+                    directory->addNewFile_Directory(newDirectory);
+                }
+                extra_entry = vector <vector <BYTE>>{};
+                main_entry = vector <BYTE>{};
+            }
+            else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] == 0xE5)
+            {
+                extra_entry = vector <vector <BYTE>>{};
+                main_entry = vector <BYTE>{};
+            }
+            start_byte += 32;
+        }
+        delete[] data;
+    }
+    CloseHandle(hDrive);
 }
 
 
-void read_FAT32_Drives(Computer& MyPC)
+//void read_next_sector(FileSystemEntity* f, Drive* dr, wstring drivePath)
+//{
+//    FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
+//    HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+//    if (hDrive == INVALID_HANDLE_VALUE) {
+//        cout << "Failed to open physical drive." << endl;
+//        return;
+//    }
+//    DWORD bytesRead;
+//    int bytes_read = 0;
+//    int cluster_pos = f->get_pos_cluster(0) * 4;
+//    BYTE fat1[512];
+//    while (true)
+//    {
+//        if (bytes_read >= bs.byte_per_sector * bs.sector_per_FAT)
+//        {
+//            cout << "Read outside FAT1\n";
+//            break;
+//        }
+//        SetFilePointer(hDrive, bs.byte_per_sector * bs.sector_before_FAT_table + bytes_read, NULL, FILE_BEGIN);
+//   
+//        if (!ReadFile(hDrive, fat1, sizeof(fat1), &bytesRead, NULL)) {
+//            wcerr << "Failed to read boot sector from physical drive." << endl;
+//            CloseHandle(hDrive);
+//            return;
+//        }
+//        bytes_read += 512;
+//        if (cluster_pos < 512)
+//        {
+//            if (cluster_pos + 3 >= 512)
+//            {
+//                if (cluster_pos + 1 == 512)
+//                {
+//                    cluster_pos -= 1;
+//                    bytes_read += 1;
+//                }
+//                else if (cluster_pos + 2 == 512)
+//                {
+//                    cluster_pos -= 2;
+//                    bytes_read += 2;
+//                }
+//                else if (cluster_pos + 3 == 512)
+//                {
+//                    cluster_pos -= 3;
+//                    bytes_read += 3;
+//                }
+//            }
+//            bool is_empty = 1;
+//            for (int i = 0; i < 4; i++)
+//            {
+//                int value = fat1[cluster_pos + i];
+//                if (value != 0x00)
+//                    is_empty = 0;
+//                if (!is_empty && value != 0xFF)
+//                    break;
+//                if (value == 0xFF || value == 0xF7 || (value == 0x00 && is_empty))
+//                    return;
+//            }
+//            cluster_pos += fat1[cluster_pos] | (fat1[cluster_pos + 1] << 8) | (fat1[cluster_pos + 2] << 16) | (fat1[cluster_pos + 3] << 24);
+//            f->add_cluster_pos(cluster_pos);
+//        }
+//        if (cluster_pos > (int)bytesRead)
+//        {
+//            cluster_pos -= 512;
+//            continue;
+//        }
+//    }
+//}
+
+
+void Computer::read_FAT32_Drives()
 {
-    int num_of_drives = MyPC.root_Drives.size();
-    wstring wideDriveLetter = stringToWideString(MyPC.root_Drives[1]->getName());
+    int num_of_drives = root_Drives.size();
+    wstring wideDriveLetter = stringToWideString(root_Drives[1]->getName());
     wstring drivePath = L"\\\\.\\" + wideDriveLetter;
     read_FAT32_BootSector(MyPC, 1,drivePath);
-    read_FAT32_RDET(MyPC, 1, drivePath);
+    read_FAT32_RDET_DATA(MyPC, 1, drivePath);
 }
 
 void detectFormat(Computer& MyPC)

@@ -33,12 +33,14 @@ protected:
     Time time_created;
     vector <int> cluster_pos;
     long long total_size;
+    vector <vector<BYTE>>data;
 
 public:
     FileSystemEntity() = default;
 
     void setName(string name) { this->name = name; }
     string getName() { return name; }
+
 
     void setTime(Time t) { this->time_created = t; }
     void setDate(Date d) { this->date_created = d; }
@@ -48,6 +50,18 @@ public:
 
     void setTotalSize(int size) { this->total_size = size; }
     long long getTotalSize() { return total_size; }
+
+    void pushData(vector<BYTE>DATA) { data.push_back(DATA); }
+
+    void getClusterPos(vector <int>& vec)
+    {
+        vec = vector<int>{};
+        for (int i = 0; i < cluster_pos.size(); i++)
+        {
+            vec.push_back(cluster_pos[i]);
+        }
+    }
+
     virtual void displayInfo() {};
 };
 
@@ -93,8 +107,18 @@ public:
             cout << cluster_pos[i] << ", ";
         }
         cout << endl;
+        cout << contents.size() << endl;
+        for (int i = 0; i < contents.size(); i++)
+        {
+            contents[i]->displayInfo();
+        }
     }
-    
+
+    void addNewFile_Directory(FileSystemEntity* f)
+    {
+        contents.push_back(f);
+    }
+
     ~Directory()
     {
         for (int i = 0; i < contents.size(); i++)
@@ -163,16 +187,23 @@ public:
     void addRootDrive(Drive*& d) {
         root_Drives.push_back(d);
     }
-
+    void read_FAT32_Drives();
+    void read_FAT32_BootSector(int ith_drive, wstring drivePath);
+    void read_FAT32_RDET_DATA(int ith_drive, wstring drivePath);
 };
+
+
 int littleEndianByteArrayToInt(const BYTE* byteArray, size_t length);
 void detectFormat(Computer& MyPC);
 void GetRemovableDriveNames(Computer& MyPC);
 void read_FAT32_BootSector(Computer& MyPC, int ith_drive, wstring drivePath);
 void read_FAT32_Drives(Computer& MyPC);
-void read_FAT32_RDET(Computer& MyPC, int ith_drive, wstring drivePath);
+void read_FAT32_RDET_DATA(Computer& MyPC, int ith_drive, wstring drivePath);
+void read_next_sector(FileSystemEntity* f, Drive* dr, wstring drivePath);
+void readDirectoryData(Directory*& directory, Drive* dr, wstring drivePath);
+
+
 wstring stringToWideString(const string& str);
 string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry);
 Date createDate(vector <BYTE> main_entry);
 Time createTime(vector <BYTE> main_entry);
-void read_next_sector(FileSystemEntity* f, Drive dr, wstring drivePath);

@@ -1,52 +1,15 @@
 ﻿  function.cpp
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(66,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(91,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(100,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(150,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(155,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(136,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(169,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(170,85): error C2664: 'void read_next_sector(FileSystemEntity *,Drive,std::wstring)': cannot convert argument 2 from '_Ty' to 'Drive'
-          with
-          [
-              _Ty=Drive *
-          ]
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(170,85): message : No constructor could take the source type, or constructor overload resolution was ambiguous
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(178,6): message : see declaration of 'read_next_sector'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(180,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(181,90): error C2664: 'void read_next_sector(FileSystemEntity *,Drive,std::wstring)': cannot convert argument 2 from '_Ty' to 'Drive'
-          with
-          [
-              _Ty=Drive *
-          ]
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(181,90): message : No constructor could take the source type, or constructor overload resolution was ambiguous
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(178,6): message : see declaration of 'read_next_sector'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(221,5): error C2059: syntax error: '}'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(221,5): error C2143: syntax error: missing ';' before '}'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(225,6): error C2182: 'read_FAT32_Drives': illegal use of type 'void'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(225,6): error C2365: 'read_FAT32_Drives': redefinition; previous definition was 'function'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(172): message : see declaration of 'read_FAT32_Drives'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(225,24): error C2039: 'Computer': is not a member of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(18): message : see declaration of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(225,34): error C2039: 'MyPC': is not a member of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(18): message : see declaration of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(226,1): error C2143: syntax error: missing ';' before '{'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(226,1): error C2447: '{': missing function header (old-style formal list?)
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(234,6): error C2182: 'detectFormat': illegal use of type 'void'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(234,6): error C2365: 'detectFormat': redefinition; previous definition was 'function'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(169): message : see declaration of 'detectFormat'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(234,19): error C2039: 'Computer': is not a member of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(18): message : see declaration of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(234,29): error C2039: 'MyPC': is not a member of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(18): message : see declaration of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(235,1): error C2143: syntax error: missing ';' before '{'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(235,1): error C2447: '{': missing function header (old-style formal list?)
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(271,6): error C2182: 'GetRemovableDriveNames': illegal use of type 'void'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(271,6): error C2365: 'GetRemovableDriveNames': redefinition; previous definition was 'function'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(170): message : see declaration of 'GetRemovableDriveNames'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(271,29): error C2039: 'Computer': is not a member of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(18): message : see declaration of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(271,39): error C2039: 'MyPC': is not a member of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(18): message : see declaration of 'FAT32_BOOTSECTOR'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(271,45): error C2143: syntax error: missing ';' before '{'
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(271,45): error C2447: '{': missing function header (old-style formal list?)
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(59,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(80,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(105,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(111,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(124,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(174,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(179,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(163,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(174,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(247,23): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(284,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(295,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\function.cpp(445,23): warning C4018: '<': signed/unsigned mismatch
+  Project 2.vcxproj -> D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Debug\Project 2.exe
