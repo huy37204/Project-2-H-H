@@ -56,19 +56,19 @@ string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
         {
             for (int j = 0x01; j < 0x01 + 10; j++)
             {
-                if (extra_entry[i][j] == 0x0f)
+                if (extra_entry[i][j] == 0xFF)
                     return oss.str();
                 oss << hex << extra_entry[i][j];
             }
             for (int j = 0x0E; j < 0x0E + 12; j++)
             {
-                if (extra_entry[i][j] == 0x0f)
+                if (extra_entry[i][j] == 0xFF)
                     return oss.str();
                 oss << hex << extra_entry[i][j];
             }
             for (int j = 0x1C; j < 0x1C + 4; j++)
             {
-                if (extra_entry[i][j] == 0x0f)
+                if (extra_entry[i][j] == 0xFF)
                     return oss.str();
                 oss << hex << extra_entry[i][j];
             }
@@ -78,7 +78,7 @@ string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
     {
         for (int i = 0x00; i <= 0x00 + 11; i++)
         {
-            if (main_entry[i] == 0x0f)
+            if (main_entry[i] == 0xFF)
                 return oss.str();
             oss << hex << main_entry[i];
         }
@@ -150,6 +150,7 @@ void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
             {
                 copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
                 string name = createName(extra_entry, main_entry);
+                size_t lastNonSpace = name.find_last_not_of(" ");
                 Date d = createDate(main_entry);
                 Time t = createTime(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
@@ -176,13 +177,13 @@ void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
                     newDirectory->read_next_sector(root_Drives[ith_drive], drivePath);
                     root_Drives[ith_drive]->addNewFile_Directory(newDirectory);
                 }
-                extra_entry = vector <vector <BYTE>>{};
-                main_entry = vector <BYTE>{};
+                extra_entry.clear();
+                main_entry.clear();
             }
             else if ((attribute == 0x10 || attribute == 0x20) && rdet[start_byte] == 0xE5)
             {
-                extra_entry = vector <vector <BYTE>>{};
-                main_entry = vector <BYTE>{};
+                extra_entry.clear();
+                main_entry.clear();
             }
             else if (attribute == 0x00)
             {
@@ -212,6 +213,7 @@ void FileSystemEntity::read_next_sector(Drive* dr, wstring drivePath)
         if (!ReadFile(hDrive, fat1, bs.byte_per_sector * bs.sector_per_FAT, &bytesRead, NULL)) {
             wcerr << "Failed to read FAT1 from physical drive." << endl;
             CloseHandle(hDrive);
+            delete[] fat1;
             return;
         }
         bool is_empty = 1;
@@ -229,6 +231,35 @@ void FileSystemEntity::read_next_sector(Drive* dr, wstring drivePath)
         add_cluster_pos(cluster_pos);
     }
     delete[] fat1;
+}
+
+void File::readData(Drive* dr, wstring drivePath)
+{
+    FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
+    vector <int> pos_cluster;
+    getClusterPos(pos_cluster);
+    HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if (hDrive == INVALID_HANDLE_VALUE) {
+        cout << "Failed to open physical drive." << endl;
+        return;
+    }
+    DWORD bytesRead;
+    int bytes_per_cluster = bs.byte_per_sector * bs.sector_per_cluster;
+    for (int i = 0; i < pos_cluster.size(); i++)
+    {
+        int byte_cluster_pos = bs.byte_per_sector * (bs.sector_before_FAT_table + bs.num_of_FAT_tables * bs.sector_per_FAT + (pos_cluster[i] - bs.first_cluster_of_RDET) * bs.sector_per_cluster);
+        SetFilePointer(hDrive, byte_cluster_pos, NULL, FILE_BEGIN);
+        BYTE* data = new BYTE[bytes_per_cluster];
+        if (!ReadFile(hDrive, data, bytes_per_cluster, &bytesRead, NULL)) {
+            wcerr << "Failed to read boot sector from physical drive." << endl;
+            CloseHandle(hDrive);
+            return;
+        }
+        vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
+        pushData(data_each_cluster);
+        delete[] data;
+    }
+    CloseHandle(hDrive);
 }
 
 void Directory::readDirectoryData(Drive* dr, wstring drivePath)

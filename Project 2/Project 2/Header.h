@@ -96,6 +96,7 @@ public:
     {
         FileSystemEntity::read_next_sector(dr, drivePath);
     }
+    void readData(Drive* dr, wstring drivePath);
 };
 
 
@@ -146,6 +147,10 @@ public:
             if (dynamic_cast<Directory*>(contents[i]))
             {
                 static_cast<Directory*>(contents[i])->readData(dr, drivePath);
+            }
+            else
+            {
+                static_cast<File*>(contents[i])->readData(dr, drivePath);
             }
         }
     }
