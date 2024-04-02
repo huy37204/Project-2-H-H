@@ -5,6 +5,6 @@ int main() {
     Computer MyPC;
     MyPC.detectFormat();
     MyPC.readDrives();
-    /*MyPC.DispayInfo();*/
+    MyPC.DispayInfo();
     return 0;
 }

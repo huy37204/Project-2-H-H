@@ -360,13 +360,13 @@ void Directory::readDirectoryData(Drive* dr, wstring drivePath)
 void Computer::readDrives()
 {
     int num_of_drives = root_Drives.size();
-    wstring wideDriveLetter = stringToWideString(root_Drives[0]->getName());
+    wstring wideDriveLetter = stringToWideString(root_Drives[1]->getName());
     wstring drivePath = L"\\\\.\\" + wideDriveLetter;
-    read_NTFS_VBR(0, drivePath);
-    read_NTFS_MFT(0, drivePath);
-    /*read_FAT32_BootSector(1,drivePath);
+   /* read_NTFS_VBR(0, drivePath);
+    read_NTFS_MFT(0, drivePath);*/
+    read_FAT32_BootSector(1,drivePath);
     read_FAT32_RDET(1, drivePath);
-    readData(drivePath);*/
+    readData(drivePath);
 }
 
 void Computer::detectFormat()
@@ -387,21 +387,21 @@ void Computer::detectFormat()
     int drive_order = 0;
     for (int i = 0x01BE + 4; i < sizeof(mbr); i += 16) {// offset 0x04 bat dau tu 0x01BE, Bang mo ta 1 partition cua MBR = 16 bytes 
         if (mbr[i] == 0x07) {
-            root_Drives[drive_order++]->setType("NTFS");
+            root_Drives[drive_order]->setType("NTFS");
         }
         else if (mbr[i] == 0x0C || mbr[i] == 0x0B) {
-            root_Drives[drive_order++]->setType("FAT32");
+            root_Drives[drive_order]->setType("FAT32");
         }
         else if (mbr[i] == 0x00)
             break;
         else {
-            root_Drives[drive_order++]->setType("Unknown");
+            root_Drives[drive_order]->setType("Unknown");
         }
-        //Doc vi tri sector bat dau
-        //BYTE startSector[5];
-        //memcpy(startSector, &mbr[i + 4], 4);
-        //startSector[4] = '\0';
-        //root_Drives[drive_order++]->setStartedByte(littleEndianByteArrayToInt(startSector, 4));
+
+        BYTE startSector[5];
+        memcpy(startSector, &mbr[i + 4], 4);
+        startSector[4] = '\0';
+        root_Drives[drive_order++]->setStartedByte(littleEndianByteArrayToInt(startSector, 4));
     }
     CloseHandle(hDrive);
 }

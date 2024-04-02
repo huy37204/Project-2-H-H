@@ -269,7 +269,7 @@ public:
     }
     void DisplayInfo()
     {
-        cout << "Drive " << name << "\n";
+        cout << "Drive " << name << " " << type << endl;
         for (int i = 0; i < rootDirectories_Files.size(); i++)
             rootDirectories_Files[i]->displayInfo();
     }
