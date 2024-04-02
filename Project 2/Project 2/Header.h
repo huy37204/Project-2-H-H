@@ -9,6 +9,7 @@
 #include <sstream>
 using namespace std;
 
+
 class Drive;
 
 struct Date
@@ -30,6 +31,42 @@ struct FAT32_BOOTSECTOR
     int first_cluster_of_RDET;
 };
 
+struct NTFS_VBR
+{
+    int byte_per_sector;
+    int sector_per_cluster;
+    int sum_sector_of_drive;
+    int started_cluster_of_MFT;
+    int started_cluster_of_extra_MFT;
+    int byte_per_MFT_entry;
+};
+
+struct Header_MFT_Entry
+{
+    int started_attribute_offset;
+    int flag;
+    int byte_used;
+    int byte_of_MFT_entry;
+    int ID;
+};
+
+struct Header_Attribute
+{
+    long long type_id; // Ma loai
+    int size_of_attribute;
+    int flag_resident;
+    int length_name_attribute;
+    int offset_of_name;
+    int flags;
+    int attribute_id;
+};
+
+
+struct NTFS_MFT
+{
+    Header_MFT_Entry MFT_header;
+    vector <Header_Attribute> header_attributes;
+};
 
 class FileSystemEntity {
 protected:
@@ -40,7 +77,7 @@ protected:
     vector <int> cluster_pos;
     long long total_size;
     vector <vector<BYTE>>data;
-
+    string text;
 public:
     FileSystemEntity() = default;
 
@@ -77,7 +114,6 @@ public:
 
 class File : public FileSystemEntity {
 private:
-
 public:
     File() = default;
     void displayInfo() {
@@ -91,12 +127,14 @@ public:
             cout << cluster_pos[i] << "; ";
         }
         cout << endl;
+        cout << text << endl;
     }
     void read_next_sector(Drive* dr, wstring drivePath)
     {
         FileSystemEntity::read_next_sector(dr, drivePath);
     }
     void readData(Drive* dr, wstring drivePath);
+    void byteArrayToString();
 };
 
 
@@ -151,6 +189,7 @@ public:
             else
             {
                 static_cast<File*>(contents[i])->readData(dr, drivePath);
+                static_cast<File*>(contents[i])->byteArrayToString();
             }
         }
     }
@@ -173,6 +212,9 @@ private:
     int started_byte_rdet;
     vector<FileSystemEntity*> rootDirectories_Files;
     FAT32_BOOTSECTOR fat32bs;
+
+    NTFS_VBR vbr;
+    NTFS_MFT mft;
 public:
     void set_fat32_bootsector(int byte_per_sector, int sector_per_cluster, int sector_before_FAT_table, int num_of_FAT_tables, int Volume_size, int sector_per_FAT, int first_cluster_of_RDET)
     {
@@ -185,6 +227,24 @@ public:
         this->fat32bs.first_cluster_of_RDET = first_cluster_of_RDET;
         this->started_byte_rdet = (sector_per_FAT * num_of_FAT_tables + sector_before_FAT_table) * byte_per_sector ;
     }
+
+    void set_ntfs_vbr(int byte_per_sector, int sector_per_cluster, int sum_sector_of_drive, int started_cluster_of_MFT, int started_cluster_of_extra_MFT, int byte_per_MFT_entry) {
+        this->vbr.byte_per_sector = byte_per_sector;
+        this->vbr.sector_per_cluster = sector_per_cluster;
+        this->vbr.sum_sector_of_drive = sum_sector_of_drive;
+        this->vbr.started_cluster_of_MFT = started_cluster_of_MFT;
+        this->vbr.started_cluster_of_extra_MFT = started_cluster_of_extra_MFT;
+        this->vbr.byte_per_MFT_entry = byte_per_MFT_entry;
+    }
+
+    void setMFT(Header_MFT_Entry mft_header)
+    {
+        this->mft.MFT_header = mft_header;
+    }
+    NTFS_MFT getMFT() { return mft; }
+    void pushHeaderAttribute(Header_Attribute h) { mft.header_attributes.push_back(h); }
+    NTFS_VBR getVBRIn4() { return vbr; }
+
     FAT32_BOOTSECTOR getBootSectorIn4() { return fat32bs; }
 
     void setName(string name)
@@ -221,8 +281,14 @@ public:
             {
                 static_cast<Directory*>(rootDirectories_Files[i])->readData(this, drivePath);
             }
+            else
+            {
+                static_cast<File*>(rootDirectories_Files[i])->readData(this, drivePath);
+                static_cast<File*>(rootDirectories_Files[i])->byteArrayToString();
+            }
         }
     }
+
     ~Drive()
     {
         for (int i = 0; i < rootDirectories_Files.size(); i++)
@@ -237,9 +303,13 @@ public:
     void addRootDrive(Drive*& d) {
         root_Drives.push_back(d);
     }
-    void read_FAT32_Drives();
+    void readDrives();
     void read_FAT32_BootSector(int ith_drive, wstring drivePath);
     void read_FAT32_RDET(int ith_drive, wstring drivePath);
+
+    void read_NTFS_VBR(int ith_drive, wstring drivePath);
+    void read_NTFS_MFT(int ith_drive, wstring drivePath);
+
     void detectFormat();
     void GetRemovableDriveNames();
     void DispayInfo()
@@ -259,6 +329,8 @@ public:
             }
         }
     }
+
+
 };
 
 
@@ -267,5 +339,6 @@ wstring stringToWideString(const string& str);
 string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry);
 Date createDate(vector <BYTE> main_entry);
 Time createTime(vector <BYTE> main_entry);
+int byteToTwosComplement(int byteValue);
 
 #endif
