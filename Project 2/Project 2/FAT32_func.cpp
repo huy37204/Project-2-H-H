@@ -1,19 +1,8 @@
 #include "Header.h"
 
 
-wstring stringToWideString(const string& str) {
-    wstring wideStr(str.begin(), str.end());
-    return wideStr;
-}
 
-int littleEndianByteArrayToInt(const BYTE* byteArray, size_t length) {
-    int result = 0;
-    for (size_t i = 0; i < length; ++i) {
-        result |= (static_cast<int>(byteArray[i]) << (i * 8));
-    }
-    return result;
-}
-void Computer::read_FAT32_BootSector(int ith_drive, wstring drivePath)
+void Computer::FAT32_Read_BootSector(int ith_drive, wstring drivePath)
 {
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
@@ -47,7 +36,7 @@ void Computer::read_FAT32_BootSector(int ith_drive, wstring drivePath)
     CloseHandle(hDrive);
 }
 
-string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
+string FAT32_Create_Name(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
 {
     ostringstream oss;
     if (!extra_entry.empty())
@@ -85,7 +74,7 @@ string createName(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
     }
     return oss.str();
 }
-Date createDate(vector <BYTE> main_entry)
+Date FAT32_Create_Date(vector <BYTE> main_entry)
 {
     vector <BYTE> bigedian_date(2);
     for (int i = 0; i <= 1; i++)
@@ -98,7 +87,7 @@ Date createDate(vector <BYTE> main_entry)
     d.day = (bigedian_date[1]) & 0x1F;
     return d;
 }
-Time createTime(vector <BYTE> main_entry)
+Time FAT32_Create_Time(vector <BYTE> main_entry)
 {
     vector <BYTE> bigedian_time(3);
     for (int i = 0; i <= 2; i++)
@@ -114,7 +103,7 @@ Time createTime(vector <BYTE> main_entry)
     return t;
 }
 
-void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
+void Computer::FAT32_Read_RDET(int ith_drive, wstring drivePath)
 {
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
@@ -155,9 +144,9 @@ void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
             else if ((attribute == 0x10 || attribute == 0x20) && rdet[start_byte] != 0xE5)
             {
                 copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
-                string name = createName(extra_entry, main_entry);
-                Date d = createDate(main_entry);
-                Time t = createTime(main_entry);
+                string name = FAT32_Create_Name(extra_entry, main_entry);
+                Date d = FAT32_Create_Date(main_entry);
+                Time t = FAT32_Create_Time(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
                 long long total_size = main_entry[0x1C] | (main_entry[0x1C + 1] << 8) | (main_entry[0x1C + 2] << 16) | (main_entry[0x1C + 3] << 24);
                 if (attribute == 0x20)
@@ -168,7 +157,7 @@ void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
                     newFile->setTime(t);
                     newFile->add_cluster_pos(started_cluster);
                     newFile->setTotalSize(total_size);
-                    newFile->read_next_sector(root_Drives[ith_drive], drivePath);
+                    newFile->FAT32_Read_Next_Sector(root_Drives[ith_drive], drivePath);
                     root_Drives[ith_drive]->addNewFile_Directory(newFile);
                 }
                 else
@@ -179,7 +168,7 @@ void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
                     newDirectory->setTime(t);
                     newDirectory->add_cluster_pos(started_cluster);
                     newDirectory->setTotalSize(total_size);
-                    newDirectory->read_next_sector(root_Drives[ith_drive], drivePath);
+                    newDirectory->FAT32_Read_Next_Sector(root_Drives[ith_drive], drivePath);
                     root_Drives[ith_drive]->addNewFile_Directory(newDirectory);
                 }
                 extra_entry.clear();
@@ -200,7 +189,7 @@ void Computer::read_FAT32_RDET(int ith_drive, wstring drivePath)
     CloseHandle(hDrive);
 }
 
-void FileSystemEntity::read_next_sector(Drive* dr, wstring drivePath)
+void FileSystemEntity::FAT32_Read_Next_Sector(Drive* dr, wstring drivePath)
 {
     FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
@@ -247,11 +236,11 @@ void File::byteArrayToString()
     }
 }
 
-void File::readData(Drive* dr, wstring drivePath)
+void File::FAT32_Read_Data(Drive* dr, wstring drivePath)
 {
     FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
     vector <int> pos_cluster;
-    getClusterPos(pos_cluster);
+    FAT32_Get_Cluster_Pos(pos_cluster);
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
         cout << "Failed to open physical drive." << endl;
@@ -270,17 +259,18 @@ void File::readData(Drive* dr, wstring drivePath)
             return;
         }
         vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
-        pushData(data_each_cluster);
+        Push_Data(data_each_cluster);
         delete[] data;
     }
+    byteArrayToString();
     CloseHandle(hDrive);
 }
 
-void Directory::readDirectoryData(Drive* dr, wstring drivePath)
+void Directory::FAT32_ReadDirectoryData(Drive* dr, wstring drivePath)
 {
     FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
     vector <int> pos_cluster;
-    getClusterPos(pos_cluster);
+    FAT32_Get_Cluster_Pos(pos_cluster);
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
         cout << "Failed to open physical drive." << endl;
@@ -299,7 +289,7 @@ void Directory::readDirectoryData(Drive* dr, wstring drivePath)
             return;
         }
         vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
-        pushData(data_each_cluster);
+        Push_Data(data_each_cluster);
         int start_byte = 64; // Cho vong lap chay 32 byte cho moi vong lap
         vector <vector <BYTE>> extra_entry;
         vector <BYTE> main_entry;
@@ -315,9 +305,9 @@ void Directory::readDirectoryData(Drive* dr, wstring drivePath)
             else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] != 0xE5)
             {
                 copy(&data[start_byte], &data[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
-                string name = createName(extra_entry, main_entry);
-                Date d = createDate(main_entry);
-                Time t = createTime(main_entry);
+                string name = FAT32_Create_Name(extra_entry, main_entry);
+                Date d = FAT32_Create_Date(main_entry);
+                Time t = FAT32_Create_Time(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
                 long long total_size = main_entry[0x1C] | (main_entry[0x1C + 1] << 8) | (main_entry[0x1C + 2] << 16) | (main_entry[0x1C + 3] << 24);
                 if (attribute == 0x20)
@@ -328,7 +318,7 @@ void Directory::readDirectoryData(Drive* dr, wstring drivePath)
                     newFile->setTime(t);
                     newFile->add_cluster_pos(started_cluster);
                     newFile->setTotalSize(total_size);
-                    newFile->read_next_sector(dr, drivePath);
+                    newFile->FAT32_Read_Next_Sector(dr, drivePath);
                     this->addNewFile_Directory(newFile);
                 }
                 else
@@ -339,7 +329,7 @@ void Directory::readDirectoryData(Drive* dr, wstring drivePath)
                     newDirectory->setTime(t);
                     newDirectory->add_cluster_pos(started_cluster);
                     newDirectory->setTotalSize(total_size);
-                    newDirectory->read_next_sector(dr, drivePath);
+                    newDirectory->FAT32_Read_Next_Sector(dr, drivePath);
                     this->addNewFile_Directory(newDirectory);
                 }
                 extra_entry = vector <vector <BYTE>>{};
@@ -357,76 +347,6 @@ void Directory::readDirectoryData(Drive* dr, wstring drivePath)
     CloseHandle(hDrive);
 }
 
-void Computer::readDrives()
-{
-    int num_of_drives = root_Drives.size();
-    wstring wideDriveLetter = stringToWideString(root_Drives[1]->getName());
-    wstring drivePath = L"\\\\.\\" + wideDriveLetter;
-   /* read_NTFS_VBR(0, drivePath);
-    read_NTFS_MFT(0, drivePath);*/
-    read_FAT32_BootSector(1,drivePath);
-    read_FAT32_RDET(1, drivePath);
-    readData(drivePath);
-}
-
-void Computer::detectFormat()
-{
-    GetRemovableDriveNames();
-    HANDLE hDrive = CreateFile(L"\\\\.\\PhysicalDrive1", GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << std::endl;
-        return;
-    }
-    BYTE mbr[512]; // MBR 512 bytes
-    DWORD bytesRead;
-    if (!ReadFile(hDrive, mbr, sizeof(mbr), &bytesRead, NULL)) {
-        cout << "Failed to read MBR from physical drive." << std::endl;
-        CloseHandle(hDrive);
-        return;
-    }
-    int drive_order = 0;
-    for (int i = 0x01BE + 4; i < sizeof(mbr); i += 16) {// offset 0x04 bat dau tu 0x01BE, Bang mo ta 1 partition cua MBR = 16 bytes 
-        if (mbr[i] == 0x07) {
-            root_Drives[drive_order]->setType("NTFS");
-        }
-        else if (mbr[i] == 0x0C || mbr[i] == 0x0B) {
-            root_Drives[drive_order]->setType("FAT32");
-        }
-        else if (mbr[i] == 0x00)
-            break;
-        else {
-            root_Drives[drive_order]->setType("Unknown");
-        }
-
-        BYTE startSector[5];
-        memcpy(startSector, &mbr[i + 4], 4);
-        startSector[4] = '\0';
-        root_Drives[drive_order++]->setStartedByte(littleEndianByteArrayToInt(startSector, 4));
-    }
-    CloseHandle(hDrive);
-}
-
-void Computer::GetRemovableDriveNames() {
-    vector<string> driveNames;
-    char LogicalDrives[MAX_PATH] = { 0 };
-    DWORD dwResult = GetLogicalDriveStringsA(MAX_PATH, LogicalDrives);
-    if (dwResult > 0 && dwResult <= MAX_PATH) {
-        char* pszDrive = LogicalDrives;
-        while (*pszDrive) {
-            UINT driveType = GetDriveTypeA(pszDrive);
-            if (driveType == DRIVE_REMOVABLE) {
-                driveNames.push_back(pszDrive);
-            }
-            pszDrive += strlen(pszDrive) + 1;
-        }
-    }
-    for (int i = 0; i < driveNames.size(); i++)
-    {
-        Drive* d = new Drive;
-        d->setName(driveNames[i].substr(0, driveNames[i].size() - 1));
-        addRootDrive(d);
-    }
-}
 
 
 

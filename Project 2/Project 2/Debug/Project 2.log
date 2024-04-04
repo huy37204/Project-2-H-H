@@ -1,20 +1,103 @@
-﻿  FAT32_func.cpp
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(102,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(125,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(157,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(163,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(183,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(200,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(273,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(278,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(294,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(317,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(324,27): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(170,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(181,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(262,23): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(291,23): warning C4018: '<': signed/unsigned mismatch
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(330,43): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(341,48): warning C4244: 'argument': conversion from '__int64' to 'int', possible loss of data
-D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(423,23): warning C4018: '<': signed/unsigned mismatch
+﻿  Computer_func.cpp
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(113,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(143,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(166,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(191,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(197,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(217,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(237,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(247,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(313,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(332,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(348,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(363,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(386,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(393,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Computer_func.cpp(5,23): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Computer_func.cpp(74,23): warning C4018: '<': signed/unsigned mismatch
+  Extra_func.cpp
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(113,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(143,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(166,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(191,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(197,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(217,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(237,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(247,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(313,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(332,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(348,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(363,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(386,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(393,27): warning C4018: '<': signed/unsigned mismatch
+  NTFS_func.cpp
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(113,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(143,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(166,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(191,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(197,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(217,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(237,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(247,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(313,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(332,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(348,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(363,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(386,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(393,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(24,134): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(24,158): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(24,182): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(24,206): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(25,137): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(25,161): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(25,185): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(25,209): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(26,143): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(26,167): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(26,191): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(26,215): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(27,28): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(130,137): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(130,159): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(252,137): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(252,159): warning C4293: '<<': shift count negative or too big, undefined behavior
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(353,20): warning C4244: 'return': conversion from '__int64' to 'int', possible loss of data
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(407,23): warning C4018: '<=': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(419,23): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\NTFS_func.cpp(356): warning C4715: 'NTFS_Read_BITMAP': not all control paths return a value
+  FAT32_func.cpp
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(113,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(143,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(166,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(191,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(197,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(217,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(237,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(247,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(313,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(332,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(348,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(363,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(386,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(393,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(251,23): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\FAT32_func.cpp(281,23): warning C4018: '<': signed/unsigned mismatch
+  main.cpp
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(113,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(143,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(166,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(191,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(197,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(217,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(237,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(247,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(313,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(332,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(348,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(363,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(386,27): warning C4018: '<': signed/unsigned mismatch
+D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Project 2\Header.h(393,27): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
   Project 2.vcxproj -> D:\Hoc tap\He Dieu Hanh\Project 2\Project 2\Debug\Project 2.exe
