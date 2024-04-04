@@ -4,12 +4,12 @@ void Computer::readDrives()
 {
     for (int i = 0; i < root_Drives.size(); i++)
     {
-        wstring wideDriveLetter = stringToWideString(root_Drives[i]->getName());
-        wstring drivePath = L"\\\\.\\" + wideDriveLetter;
+        std::wstring wideDriveLetter = stringToWideString(root_Drives[i]->getName());
+        std::wstring drivePath = L"\\\\.\\" + wideDriveLetter;
         if (root_Drives[i]->getType() == "NTFS")
         {
-            NTFS_Read_VBR(0, drivePath);
-            NTFS_Read_MFT(0, drivePath);
+            NTFS_Read_VBR(i, drivePath);
+            NTFS_Read_MFT(i, drivePath);
         }
         else if (root_Drives[i]->getType() == "FAT32")
         {
@@ -25,13 +25,13 @@ void Computer::detectFormat()
     GetRemovableDriveNames();
     HANDLE hDrive = CreateFile(L"\\\\.\\PhysicalDrive1", GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << std::endl;
+        std::cout << "Failed to open physical drive." << std::endl;
         return;
     }
     BYTE mbr[512]; // MBR 512 bytes
     DWORD bytesRead;
     if (!ReadFile(hDrive, mbr, sizeof(mbr), &bytesRead, NULL)) {
-        cout << "Failed to read MBR from physical drive." << std::endl;
+        std::cout << "Failed to read MBR from physical drive." << std::endl;
         CloseHandle(hDrive);
         return;
     }
@@ -58,7 +58,7 @@ void Computer::detectFormat()
 }
 
 void Computer::GetRemovableDriveNames() {
-    vector<string> driveNames;
+    std::vector<std::string> driveNames;
     char LogicalDrives[MAX_PATH] = { 0 };
     DWORD dwResult = GetLogicalDriveStringsA(MAX_PATH, LogicalDrives);
     if (dwResult > 0 && dwResult <= MAX_PATH) {

@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
-using namespace std;
+
 
 
 class Drive;
@@ -68,7 +68,7 @@ struct Header_Attribute
 struct NTFS_MFT
 {
     Header_MFT_Entry MFT_header;
-    vector <Header_Attribute> header_attributes;
+    std::vector <Header_Attribute> header_attributes;
 };
 
 struct NonResidentInfo
@@ -78,22 +78,22 @@ struct NonResidentInfo
 };
 class FileSystemEntity {
 protected:
-    string name;
-    string attributes;
+    std::string name;
+    std::string attributes;
     Date date_created;
     Time time_created;
-    vector <int> cluster_pos;
+    std::vector <int> cluster_pos;
     long long total_size;
-    vector <vector<BYTE>>data;
+    std::vector <std::vector<BYTE>>data;
 
     NTFS_MFT mft;
-    string text;
+    std::string text;
     NonResidentInfo nonresidentinfo;
 public:
     FileSystemEntity() = default;
 
-    void setName(string name) { this->name = name; }
-    string getName() { return name; }
+    void setName(std::string name) { this->name = name; }
+    std::string getName() { return name; }
 
 
     void setTime(Time t) { this->time_created = t; }
@@ -105,11 +105,11 @@ public:
     void setTotalSize(long long size) { this->total_size = size; }
     long long getTotalSize() { return total_size; }
 
-    void Push_Data(vector<BYTE>DATA) { data.push_back(DATA); }
+    void Push_Data(std::vector<BYTE>DATA) { data.push_back(DATA); }
 
-    void FAT32_Get_Cluster_Pos(vector <int>& vec)
+    void FAT32_Get_Cluster_Pos(std::vector <int>& vec)
     {
-        vec = vector<int>{};
+        vec = std::vector<int>{};
         for (int i = 0; i < cluster_pos.size(); i++)
         {
             vec.push_back(cluster_pos[i]);
@@ -124,7 +124,7 @@ public:
     int NTFS_Get_ID() { return mft.MFT_header.ID; }
     void pushHeaderAttribute(Header_Attribute h) { mft.header_attributes.push_back(h); }
 
-    void FAT32_Read_Next_Sector(Drive* dr, wstring drivePath);
+    void FAT32_Read_Next_Sector(Drive* dr, std::wstring drivePath);
 
     virtual void displayInfo() {};
     virtual ~FileSystemEntity() {};
@@ -136,22 +136,22 @@ private:
 public:
     File() = default;
     void displayInfo() override {
-        cout << "File: " << getName() << "; ";
-        cout << "Date created: " << date_created.day << "/" << date_created.month << "/" << date_created.year << "; ";
-        cout << "Time created: " << time_created.hour << ":" << time_created.minute << ":" << time_created.second << ":" << time_created.milisecond << "; ";
-        cout << "Total size: " << total_size << "; ";
+        std::cout << "File: " << getName() << "; ";
+        std::cout << "Date created: " << date_created.day << "/" << date_created.month << "/" << date_created.year << "; ";
+        std::cout << "Time created: " << time_created.hour << ":" << time_created.minute << ":" << time_created.second << ":" << time_created.milisecond << "; ";
+        std::cout << "Total size: " << total_size << "; ";
         for (int i = 0; i < cluster_pos.size(); i++)
         {
-            cout << cluster_pos[i] << "; ";
+            std::cout << cluster_pos[i] << "; ";
         }
-        cout << endl;
-        cout << text << endl;
+        std::cout << std::endl;
+        std::cout << text << std::endl;
     }
-    void FAT32_Read_Next_Sector(Drive* dr, wstring drivePath)
+    void FAT32_Read_Next_Sector(Drive* dr, std::wstring drivePath)
     {
         FileSystemEntity::FAT32_Read_Next_Sector(dr, drivePath);
     }
-    void FAT32_Read_Data(Drive* dr, wstring drivePath);
+    void FAT32_Read_Data(Drive* dr, std::wstring drivePath);
     void byteArrayToString();
     void NTFS_Set_MFT(Header_MFT_Entry mft_header)
     {
@@ -159,9 +159,9 @@ public:
     }
 
     void NTFS_Read_Resident_Data(BYTE* attr, Header_Attribute h); // Su dung trong Computer::NTFS_Read_MFT()
-    void NTFS_Read_Non_Resident_Info(BYTE* attr, NTFS_VBR vbr, int datarun_offset, wstring drivePath, long long datasize);
-    void NTFS_Nonresident_Read_Data(wstring drivePath, NTFS_VBR vbr); // Point den cluster chua data o ngoai vung MFT va xu ly du lieu
-    void NTFS_read_data(wstring drivePath, NTFS_VBR vbr) // Doc nhung du lieu chua duoc doc trong MFT (Nonresident)
+    void NTFS_Read_Non_Resident_Info(BYTE* attr, NTFS_VBR vbr, int datarun_offset, std::wstring drivePath, long long datasize);
+    void NTFS_Nonresident_Read_Data(std::wstring drivePath, NTFS_VBR vbr); // Point den cluster chua data o ngoai vung MFT va xu ly du lieu
+    void NTFS_read_data(std::wstring drivePath, NTFS_VBR vbr) // Doc nhung du lieu chua duoc doc trong MFT (Nonresident)
     {
         for (int i = 0; i < mft.header_attributes.size(); i++)
         {
@@ -178,22 +178,22 @@ public:
 
 class Directory : public FileSystemEntity {
 private:
-    vector<FileSystemEntity*> contents;
+    std::vector<FileSystemEntity*> contents;
 public:
     Directory() = default;
 
 
     void displayInfo() override{
-        cout << "Directory: " << getName() << "; ";
-        cout << "Date created: " << date_created.day << "/" << date_created.month << "/" << date_created.year << "; ";
-        cout << "Time created: " << time_created.hour << ":" << time_created.minute << ":" << time_created.second << ":" << time_created.milisecond << "; ";
-        cout << "Total size: " << total_size << "; ";
+        std::cout << "Directory: " << getName() << "; ";
+        std::cout << "Date created: " << date_created.day << "/" << date_created.month << "/" << date_created.year << "; ";
+        std::cout << "Time created: " << time_created.hour << ":" << time_created.minute << ":" << time_created.second << ":" << time_created.milisecond << "; ";
+        std::cout << "Total size: " << total_size << "; ";
         for (int i = 0; i < cluster_pos.size(); i++)
         {
-            cout << cluster_pos[i] << ", ";
+            std::cout << cluster_pos[i] << ", ";
         }
-        cout << endl;
-        cout << contents.size() << endl;
+        std::cout << std::endl;
+        std::cout << contents.size() << std::endl;
         for (int i = 0; i < contents.size(); i++)
         {
             contents[i]->displayInfo();
@@ -206,12 +206,12 @@ public:
         contents.push_back(f);
     }
 
-    void FAT32_Read_Next_Sector(Drive* dr, wstring drivePath)
+    void FAT32_Read_Next_Sector(Drive* dr, std::wstring drivePath)
     {
         FileSystemEntity::FAT32_Read_Next_Sector(dr, drivePath);
     }
 
-    void FAT32_Read_Data(Drive* dr, wstring drivePath)
+    void FAT32_Read_Data(Drive* dr, std::wstring drivePath)
     {
         FAT32_ReadDirectoryData(dr, drivePath);
         for (int i = 0; i < contents.size(); i++)
@@ -226,13 +226,13 @@ public:
             }
         }
     }
-    void FAT32_ReadDirectoryData(Drive* dr, wstring drivePath);
+    void FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath);
     void NTFS_Set_MFT(Header_MFT_Entry mft_header)
     {
         FileSystemEntity::NTFS_Set_MFT(mft_header);
     }
     Directory* NTFS_Find_Parent_Directory(int parent_id);
-    void NTFS_Read_Data(wstring drivePath, NTFS_VBR vbr)
+    void NTFS_Read_Data(std::wstring drivePath, NTFS_VBR vbr)
     {
         for (int i = 0; i < contents.size(); i++)
         {
@@ -253,11 +253,11 @@ public:
 
 class Drive {
 private:
-    string name;
-    string type;
+    std::string name;
+    std::string type;
     int started_byte_bootsector;
     int started_byte_rdet;
-    vector<FileSystemEntity*> rootDirectories_Files;
+    std::vector<FileSystemEntity*> rootDirectories_Files;
     FAT32_BOOTSECTOR fat32bs;
 
     NTFS_VBR vbr;
@@ -287,16 +287,16 @@ public:
 
     FAT32_BOOTSECTOR getBootSectorIn4() { return fat32bs; }
 
-    void setName(string name)
+    void setName(std::string name)
     {
         this->name = name;
     }
-    string getName() { return this->name; }
-    void setType(string type)
+    std::string getName() { return this->name; }
+    void setType(std::string type)
     {
         this->type = type;
     }
-    string getType() { return this->type; }
+    std::string getType() { return this->type; }
     void setStartedByte(int started_byte_bootsector)
     {
         this->started_byte_bootsector = started_byte_bootsector;
@@ -309,7 +309,7 @@ public:
     }
     void DisplayInfo()
     {
-        cout << "Drive " << name << " " << type << endl;
+        std::cout << "Drive " << name << " " << type << std::endl;
         for (int i = 0; i < rootDirectories_Files.size(); i++)
         {
             Directory* dir = dynamic_cast<Directory*>(rootDirectories_Files[i]);
@@ -327,7 +327,7 @@ public:
             }
         }
     }
-    void readData(wstring drivePath)
+    void readData(std::wstring drivePath)
     {
         for (int i = 0; i < rootDirectories_Files.size(); i++)
         {
@@ -342,7 +342,7 @@ public:
             }
         }
     }
-    void NTFS_Read_Data(wstring drivePath)
+    void NTFS_Read_Data(std::wstring drivePath)
     {
 
         for (int i = 0; i < rootDirectories_Files.size(); i++)
@@ -367,17 +367,17 @@ public:
 
 class Computer {
 private:
-    vector<Drive*> root_Drives;
+    std::vector<Drive*> root_Drives;
 public:
     void addRootDrive(Drive*& d) {
         root_Drives.push_back(d);
     }
     void readDrives();
-    void FAT32_Read_BootSector(int ith_drive, wstring drivePath);
-    void FAT32_Read_RDET(int ith_drive, wstring drivePath);
+    void FAT32_Read_BootSector(int ith_drive, std::wstring drivePath);
+    void FAT32_Read_RDET(int ith_drive, std::wstring drivePath);
 
-    void NTFS_Read_VBR(int ith_drive, wstring drivePath);
-    void NTFS_Read_MFT(int ith_drive, wstring drivePath);
+    void NTFS_Read_VBR(int ith_drive, std::wstring drivePath);
+    void NTFS_Read_MFT(int ith_drive, std::wstring drivePath);
 
     void detectFormat();
     void GetRemovableDriveNames();
@@ -388,7 +388,7 @@ public:
             root_Drives[i]->DisplayInfo();
         }
     }
-    void readData(wstring drivePath)
+    void readData(std::wstring drivePath)
     {
         for (int i = 0; i < root_Drives.size(); i++)
         {
@@ -407,11 +407,11 @@ public:
 
 
 int littleEndianByteArrayToInt(const BYTE* byteArray, size_t length);
-wstring stringToWideString(const string& str);
-string FAT32_Create_Name(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry);
-string NTFS_Create_Name(BYTE* attr, Header_Attribute h);
-Date FAT32_Create_Date(vector <BYTE> main_entry);
-Time FAT32_Create_Time(vector <BYTE> main_entry);
+std::wstring stringToWideString(const std::string& str);
+std::string FAT32_Create_Name(std::vector <std::vector <BYTE>> extra_entry, std::vector <BYTE> main_entry);
+std::string NTFS_Create_Name(BYTE* attr, Header_Attribute h);
+Date FAT32_Create_Date(std::vector <BYTE> main_entry);
+Time FAT32_Create_Time(std::vector <BYTE> main_entry);
 void NTFS_Create_Date_Time(BYTE* attr, Header_Attribute h, Date& d, Time& t);
 int byteToTwosComplement(int byteValue);
 int NTFS_Read_BITMAP(BYTE* attr, Header_Attribute h);

@@ -1,7 +1,7 @@
 #include "Header.h"
 
-wstring stringToWideString(const string& str) {
-    wstring wideStr(str.begin(), str.end());
+std::wstring stringToWideString(const std::string& str) {
+    std::wstring wideStr(str.begin(), str.end());
     return wideStr;
 }
 

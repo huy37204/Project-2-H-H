@@ -2,18 +2,18 @@
 
 
 
-void Computer::FAT32_Read_BootSector(int ith_drive, wstring drivePath)
+void Computer::FAT32_Read_BootSector(int ith_drive, std::wstring drivePath)
 {
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << endl;
+        std::cout << "Failed to open physical drive." << std::endl;
         return;
     }
     SetFilePointer(hDrive, 0, NULL, FILE_BEGIN);
     DWORD bytesRead;
     BYTE bootsector[512];
     if (!ReadFile(hDrive, bootsector, sizeof(bootsector), &bytesRead, NULL)) {
-        wcerr << "Failed to read boot sector from physical drive." << endl;
+        std::wcerr << "Failed to read boot sector from physical drive." << std::endl;
         CloseHandle(hDrive);
         return;
     }
@@ -25,20 +25,20 @@ void Computer::FAT32_Read_BootSector(int ith_drive, wstring drivePath)
     int sector_per_FAT = bootsector[36] | (bootsector[37] << 8) | (bootsector[38] << 16) | (bootsector[39] << 24);
     int first_cluster_of_RDET = bootsector[44] | (bootsector[45] << 8) | (bootsector[46] << 16) | (bootsector[47] << 24);
     root_Drives[ith_drive]->set_fat32_bootsector(byte_per_sector, sector_per_cluster, sector_before_FAT_table, num_of_FAT_tables, Volume_size, sector_per_FAT, first_cluster_of_RDET);
-    cout << "Byte per sector: " << byte_per_sector << endl;
-    cout << "Sector per cluster: " << sector_per_cluster << endl;
-    cout << "Sector before FAT table: " << sector_before_FAT_table << endl;
-    cout << "Num of FAT tables: " << num_of_FAT_tables << endl;
-    cout << "Volume size: " << Volume_size << endl;
-    cout << "Sector per FAT: " << sector_per_FAT << endl;
-    cout << "First cluster of RDET: " << first_cluster_of_RDET << endl;
-    wcout << endl;
+    std::cout << "Byte per sector: " << byte_per_sector << std::endl;
+    std::cout << "Sector per cluster: " << sector_per_cluster << std::endl;
+    std::cout << "Sector before FAT table: " << sector_before_FAT_table << std::endl;
+    std::cout << "Num of FAT tables: " << num_of_FAT_tables << std::endl;
+    std::cout << "Volume size: " << Volume_size << std::endl;
+    std::cout << "Sector per FAT: " << sector_per_FAT << std::endl;
+    std::cout << "First cluster of RDET: " << first_cluster_of_RDET << std::endl;
+    std::wcout << std::endl;
     CloseHandle(hDrive);
 }
 
-string FAT32_Create_Name(vector <vector <BYTE>> extra_entry, vector <BYTE> main_entry)
+std::string FAT32_Create_Name(std::vector <std::vector <BYTE>> extra_entry, std::vector <BYTE> main_entry)
 {
-    ostringstream oss;
+    std::ostringstream oss;
     if (!extra_entry.empty())
     {
         for (int i = extra_entry.size() - 1; i >= 0; i--)
@@ -47,19 +47,19 @@ string FAT32_Create_Name(vector <vector <BYTE>> extra_entry, vector <BYTE> main_
             {
                 if (extra_entry[i][j] == 0xFF)
                     return oss.str();
-                oss << hex << extra_entry[i][j];
+                oss << std::hex << extra_entry[i][j];
             }
             for (int j = 0x0E; j < 0x0E + 12; j++)
             {
                 if (extra_entry[i][j] == 0xFF)
                     return oss.str();
-                oss << hex << extra_entry[i][j];
+                oss << std::hex << extra_entry[i][j];
             }
             for (int j = 0x1C; j < 0x1C + 4; j++)
             {
                 if (extra_entry[i][j] == 0xFF)
                     return oss.str();
-                oss << hex << extra_entry[i][j];
+                oss << std::hex << extra_entry[i][j];
             }
         }
     }
@@ -69,14 +69,14 @@ string FAT32_Create_Name(vector <vector <BYTE>> extra_entry, vector <BYTE> main_
         {
             if (main_entry[i] == 0xFF)
                 return oss.str();
-            oss << hex << main_entry[i];
+            oss << std::hex << main_entry[i];
         }
     }
     return oss.str();
 }
-Date FAT32_Create_Date(vector <BYTE> main_entry)
+Date FAT32_Create_Date(std::vector <BYTE> main_entry)
 {
-    vector <BYTE> bigedian_date(2);
+    std::vector <BYTE> bigedian_date(2);
     for (int i = 0; i <= 1; i++)
     {
         bigedian_date[i] = main_entry[0x10 + 1 - i];
@@ -87,9 +87,9 @@ Date FAT32_Create_Date(vector <BYTE> main_entry)
     d.day = (bigedian_date[1]) & 0x1F;
     return d;
 }
-Time FAT32_Create_Time(vector <BYTE> main_entry)
+Time FAT32_Create_Time(std::vector <BYTE> main_entry)
 {
-    vector <BYTE> bigedian_time(3);
+    std::vector <BYTE> bigedian_time(3);
     for (int i = 0; i <= 2; i++)
     {
         bigedian_time[i] = main_entry[0x0D + 2 - i];
@@ -103,11 +103,11 @@ Time FAT32_Create_Time(vector <BYTE> main_entry)
     return t;
 }
 
-void Computer::FAT32_Read_RDET(int ith_drive, wstring drivePath)
+void Computer::FAT32_Read_RDET(int ith_drive, std::wstring drivePath)
 {
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << endl;
+        std::cout << "Failed to open physical drive." << std::endl;
         return;
     }
     DWORD bytesRead;
@@ -119,7 +119,7 @@ void Computer::FAT32_Read_RDET(int ith_drive, wstring drivePath)
         bytes_read += 512;
         BYTE rdet[512];
         if (!ReadFile(hDrive, rdet, sizeof(rdet), &bytesRead, NULL)) {
-            wcerr << "Failed to read boot sector from physical drive." << endl;
+            std::wcerr << "Failed to read boot sector from physical drive." << std::endl;
             CloseHandle(hDrive);
             return;
         }
@@ -130,21 +130,21 @@ void Computer::FAT32_Read_RDET(int ith_drive, wstring drivePath)
             }
         }*/
         int start_byte = 0; // Cho vong lap chay 32 byte cho moi vong lap
-        vector <vector <BYTE>> extra_entry;
-        vector <BYTE> main_entry;
+        std::vector <std::vector <BYTE>> extra_entry;
+        std::vector <BYTE> main_entry;
         while (start_byte < 512)
         {
             int attribute = rdet[start_byte + 0x0B]; //0-0-A-D-V-S-H-R
             if (attribute == 0x0F)
             {
-                vector<BYTE> temp_vec;
-                copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(temp_vec)); // Doc 32 byte vao entry phu
+                std::vector<BYTE> temp_vec;
+                std::copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(temp_vec)); // Doc 32 byte vao entry phu
                 extra_entry.push_back(temp_vec);
             }
             else if ((attribute == 0x10 || attribute == 0x20) && rdet[start_byte] != 0xE5)
             {
                 copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
-                string name = FAT32_Create_Name(extra_entry, main_entry);
+                std::string name = FAT32_Create_Name(extra_entry, main_entry);
                 Date d = FAT32_Create_Date(main_entry);
                 Time t = FAT32_Create_Time(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
@@ -189,12 +189,12 @@ void Computer::FAT32_Read_RDET(int ith_drive, wstring drivePath)
     CloseHandle(hDrive);
 }
 
-void FileSystemEntity::FAT32_Read_Next_Sector(Drive* dr, wstring drivePath)
+void FileSystemEntity::FAT32_Read_Next_Sector(Drive* dr, std::wstring drivePath)
 {
     FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << endl;
+        std::cout << "Failed to open physical drive." << std::endl;
         return;
     }
     DWORD bytesRead;
@@ -205,7 +205,7 @@ void FileSystemEntity::FAT32_Read_Next_Sector(Drive* dr, wstring drivePath)
         SetFilePointer(hDrive, bs.byte_per_sector * bs.sector_before_FAT_table, NULL, FILE_BEGIN);
 
         if (!ReadFile(hDrive, fat1, bs.byte_per_sector * bs.sector_per_FAT, &bytesRead, NULL)) {
-            wcerr << "Failed to read FAT1 from physical drive." << endl;
+            std::wcerr << "Failed to read FAT1 from physical drive." << std::endl;
             CloseHandle(hDrive);
             delete[] fat1;
             return;
@@ -236,14 +236,14 @@ void File::byteArrayToString()
     }
 }
 
-void File::FAT32_Read_Data(Drive* dr, wstring drivePath)
+void File::FAT32_Read_Data(Drive* dr, std::wstring drivePath)
 {
     FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
-    vector <int> pos_cluster;
+    std::vector <int> pos_cluster;
     FAT32_Get_Cluster_Pos(pos_cluster);
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << endl;
+        std::cout << "Failed to open physical drive." << std::endl;
         return;
     }
     DWORD bytesRead;
@@ -254,11 +254,11 @@ void File::FAT32_Read_Data(Drive* dr, wstring drivePath)
         SetFilePointer(hDrive, byte_cluster_pos, NULL, FILE_BEGIN);
         BYTE* data = new BYTE[bytes_per_cluster];
         if (!ReadFile(hDrive, data, bytes_per_cluster, &bytesRead, NULL)) {
-            wcerr << "Failed to read boot sector from physical drive." << endl;
+            std::wcerr << "Failed to read boot sector from physical drive." << std::endl;
             CloseHandle(hDrive);
             return;
         }
-        vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
+        std::vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
         Push_Data(data_each_cluster);
         delete[] data;
     }
@@ -266,14 +266,14 @@ void File::FAT32_Read_Data(Drive* dr, wstring drivePath)
     CloseHandle(hDrive);
 }
 
-void Directory::FAT32_ReadDirectoryData(Drive* dr, wstring drivePath)
+void Directory::FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath)
 {
     FAT32_BOOTSECTOR bs = dr->getBootSectorIn4();
-    vector <int> pos_cluster;
+    std::vector <int> pos_cluster;
     FAT32_Get_Cluster_Pos(pos_cluster);
     HANDLE hDrive = CreateFile(drivePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
-        cout << "Failed to open physical drive." << endl;
+        std::cout << "Failed to open physical drive." << std::endl;
         return;
     }
     DWORD bytesRead;
@@ -284,28 +284,28 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, wstring drivePath)
         SetFilePointer(hDrive, byte_cluster_pos, NULL, FILE_BEGIN);
         BYTE* data = new BYTE[bytes_per_cluster];
         if (!ReadFile(hDrive, data, bytes_per_cluster, &bytesRead, NULL)) {
-            wcerr << "Failed to read boot sector from physical drive." << endl;
+            std::wcerr << "Failed to read boot sector from physical drive." << std::endl;
             CloseHandle(hDrive);
             return;
         }
-        vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
+        std::vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
         Push_Data(data_each_cluster);
         int start_byte = 64; // Cho vong lap chay 32 byte cho moi vong lap
-        vector <vector <BYTE>> extra_entry;
-        vector <BYTE> main_entry;
+        std::vector <std::vector <BYTE>> extra_entry;
+        std::vector <BYTE> main_entry;
         while (start_byte < bytes_per_cluster)
         {
             int attribute = data[start_byte + 0x0B]; //0-0-A-D-V-S-H-R
             if (attribute == 0x0F)
             {
-                vector<BYTE> temp_vec;
+                std::vector<BYTE> temp_vec;
                 copy(&data[start_byte], &data[start_byte + 32], back_inserter(temp_vec)); // Doc 32 byte vao entry phu
                 extra_entry.push_back(temp_vec);
             }
             else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] != 0xE5)
             {
                 copy(&data[start_byte], &data[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
-                string name = FAT32_Create_Name(extra_entry, main_entry);
+                std::string name = FAT32_Create_Name(extra_entry, main_entry);
                 Date d = FAT32_Create_Date(main_entry);
                 Time t = FAT32_Create_Time(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
@@ -332,13 +332,13 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, wstring drivePath)
                     newDirectory->FAT32_Read_Next_Sector(dr, drivePath);
                     this->addNewFile_Directory(newDirectory);
                 }
-                extra_entry = vector <vector <BYTE>>{};
-                main_entry = vector <BYTE>{};
+                extra_entry = std::vector <std::vector <BYTE>>{};
+                main_entry = std::vector <BYTE>{};
             }
             else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] == 0xE5)
             {
-                extra_entry = vector <vector <BYTE>>{};
-                main_entry = vector <BYTE>{};
+                extra_entry = std::vector <std::vector <BYTE>>{};
+                main_entry = std::vector <BYTE>{};
             }
             start_byte += 32;
         }
