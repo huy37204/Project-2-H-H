@@ -410,7 +410,7 @@ Directory* Drive::NTFS_Find_Parent_Directory(int parent_id)
         {
             if (static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Get_ID() == parent_id)
                 return static_cast<Directory*>(rootDirectories_Files[i]);
-            static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Find_Parent_Directory(parent_id);
+            return static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Find_Parent_Directory(parent_id);
         }
     }
     return NULL;
@@ -422,13 +422,12 @@ Directory* Directory::NTFS_Find_Parent_Directory(int parent_id)
     {
         return this;
     }
+
     for (int i = 0; i < contents.size(); i++)
     {
         if (dynamic_cast<Directory*>(contents[i]))
         {
-            if (static_cast<Directory*>(contents[i])->NTFS_Get_ID() == parent_id)
-                return static_cast<Directory*>(contents[i]);
-            static_cast<Directory*>(contents[i])->NTFS_Find_Parent_Directory(parent_id);
+            return dynamic_cast<Directory*>(contents[i])->NTFS_Find_Parent_Directory(parent_id);
         }
     }
     return NULL;
