@@ -72,6 +72,7 @@ void Computer::NTFS_Read_MFT(int ith_drive, std::wstring drivePath) {
             if (flag_file_directory_used == 0x01)
             {
                 File* f = new File;
+                f->setAttributes("File");
                 Header_MFT_Entry mft_header;
                 mft_header.started_attribute_offset = mft[0x14] | mft[0x15] << 8;
                 mft_header.flag = mft[0x16] | mft[0x17] << 8;
@@ -186,6 +187,7 @@ void Computer::NTFS_Read_MFT(int ith_drive, std::wstring drivePath) {
             else if (flag_file_directory_used == 0x03)
             {
                 Directory* f = new Directory;
+                f->setAttributes("Folder");
                 Header_MFT_Entry mft_header;
                 mft_header.started_attribute_offset = mft[0x14] | mft[0x15] << 8;
                 mft_header.flag = mft[0x16] | mft[0x17] << 8;
@@ -362,16 +364,15 @@ void NTFS_Create_Date_Time(BYTE* attr, Header_Attribute h, Date& d, Time& t)
     for (int i = 0; i < 8; ++i) {
         hexValue |= static_cast<unsigned long long>(data_attr[i]) << (i * 8);
     }
-
     unsigned long long nanoSeconds = hexValue * 100;
 
-    long long epochTime1970 = 11644473600LL;
+    long long epochTime1970 = 11644473600ULL;
     long long secondsSince1970 = static_cast<long long>((nanoSeconds) / 1000000000LL) - epochTime1970;
 
     time_t timeSince1970 = static_cast<time_t>(secondsSince1970);
 
     struct tm timeinfo;
-    gmtime_s(&timeinfo, &timeSince1970);
+    localtime_s(&timeinfo, &timeSince1970);
 
     d.day = timeinfo.tm_mday;
     d.month = timeinfo.tm_mon + 1;
@@ -380,10 +381,7 @@ void NTFS_Create_Date_Time(BYTE* attr, Header_Attribute h, Date& d, Time& t)
     t.minute = timeinfo.tm_min;
     t.second = timeinfo.tm_sec;
     delete[] data_attr;
-    //cout << "Month " << timeinfo.tm_mon + 1 << ", ";
-    //cout << "Date " << timeinfo.tm_mday << ", ";
-    //cout << "Year " << timeinfo.tm_year + 1900 << ", ";
-    //cout << "Time " << timeinfo.tm_hour << ":" << timeinfo.tm_min << ":" << timeinfo.tm_sec << endl;
+
 }
 
 std::string NTFS_Create_Name(BYTE* attr, Header_Attribute h)
@@ -404,14 +402,15 @@ std::string NTFS_Create_Name(BYTE* attr, Header_Attribute h)
 
 Directory* Drive::NTFS_Find_Parent_Directory(int parent_id)
 {
-
     for (int i = 0; i < rootDirectories_Files.size(); i++)
     {
         if (dynamic_cast<Directory*>(rootDirectories_Files[i]))
         {
             if (static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Get_ID() == parent_id)
                 return static_cast<Directory*>(rootDirectories_Files[i]);
-            return static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Find_Parent_Directory(parent_id);
+            Directory* d = static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Find_Parent_Directory(parent_id);
+            if (d)
+                return d;
         }
     }
     return NULL;

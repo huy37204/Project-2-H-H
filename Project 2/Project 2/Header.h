@@ -92,6 +92,9 @@ protected:
 public:
     FileSystemEntity() = default;
 
+    void setAttributes(std::string attributes) { this->attributes = attributes; }
+    std::string getAttributes() { return attributes; }
+
     void setName(std::string name) { this->name = name; }
     std::string getName() { return name; }
 
