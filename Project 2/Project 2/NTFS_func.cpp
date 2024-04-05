@@ -404,23 +404,31 @@ std::string NTFS_Create_Name(BYTE* attr, Header_Attribute h)
 Directory* Drive::NTFS_Find_Parent_Directory(int parent_id)
 {
 
-    for (int i = 0; i <= rootDirectories_Files.size(); i++)
+    for (int i = 0; i < rootDirectories_Files.size(); i++)
     {
-        if (rootDirectories_Files[i]->NTFS_Get_ID() == parent_id)
-            return static_cast<Directory*>(rootDirectories_Files[i]);
-        if (static_cast<Directory*>(rootDirectories_Files[i]))
+        if (dynamic_cast<Directory*>(rootDirectories_Files[i]))
+        {
+            if (static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Get_ID() == parent_id)
+                return static_cast<Directory*>(rootDirectories_Files[i]);
             static_cast<Directory*>(rootDirectories_Files[i])->NTFS_Find_Parent_Directory(parent_id);
+        }
     }
     return NULL;
 }
 
 Directory* Directory::NTFS_Find_Parent_Directory(int parent_id)
 {
+    if (NTFS_Get_ID() == parent_id)
+    {
+        return this;
+    }
     for (int i = 0; i < contents.size(); i++)
     {
-        if (contents[i]->NTFS_Get_ID() == parent_id)
+        if (dynamic_cast<Directory*>(contents[i]))
         {
-            return dynamic_cast<Directory*>(contents[i]);
+            if (static_cast<Directory*>(contents[i])->NTFS_Get_ID() == parent_id)
+                return static_cast<Directory*>(contents[i]);
+            static_cast<Directory*>(contents[i])->NTFS_Find_Parent_Directory(parent_id);
         }
     }
     return NULL;
