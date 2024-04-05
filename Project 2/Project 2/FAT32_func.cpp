@@ -82,7 +82,7 @@ Date FAT32_Create_Date(std::vector <BYTE> main_entry)
         bigedian_date[i] = main_entry[0x10 + 1 - i];
     }
     Date d;
-    d.year =  1980 + ((bigedian_date[0] & 0xFE) >> 1);
+    d.year = 1980 + ((bigedian_date[0] & 0xFE) >> 1);
     d.month = ((bigedian_date[0]) & 0x01) << 3 | ((bigedian_date[1] & 0xE0) >> 5);
     d.day = (bigedian_date[1]) & 0x1F;
     return d;
@@ -97,7 +97,7 @@ Time FAT32_Create_Time(std::vector <BYTE> main_entry)
     Time t;
     t.hour = (bigedian_time[0] >> 3) & 0x1F;
     t.minute = ((bigedian_time[0] & 0x07) << 3) | ((bigedian_time[1] >> 5) & 0x07);
-    t.second = ((bigedian_time[1] & 0x1F) << 1 )| ((bigedian_time[2] >> 7) & 0x01);
+    t.second = ((bigedian_time[1] & 0x1F) << 1) | ((bigedian_time[2] >> 7) & 0x01);
     t.milisecond = (bigedian_time[2] & 0x7F);
 
     return t;
@@ -145,6 +145,8 @@ void Computer::FAT32_Read_RDET(int ith_drive, std::wstring drivePath)
             {
                 copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
                 std::string name = FAT32_Create_Name(extra_entry, main_entry);
+                name.erase(std::remove(name.begin(), name.end(), 0x00), name.end());
+                name.erase(std::remove(name.begin(), name.end(), '\0'), name.end());
                 Date d = FAT32_Create_Date(main_entry);
                 Time t = FAT32_Create_Time(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
@@ -306,6 +308,7 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath)
             {
                 copy(&data[start_byte], &data[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
                 std::string name = FAT32_Create_Name(extra_entry, main_entry);
+                name.erase(std::remove(name.begin(), name.end(), 0x00), name.end());
                 Date d = FAT32_Create_Date(main_entry);
                 Time t = FAT32_Create_Time(main_entry);
                 int started_cluster = main_entry[0x1A] | (main_entry[0x1A + 1] << 8);
@@ -346,7 +349,3 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath)
     }
     CloseHandle(hDrive);
 }
-
-
-
-

@@ -80,11 +80,11 @@ void Computer::NTFS_Read_MFT(int ith_drive, std::wstring drivePath) {
                 mft_header.ID = mft[0x2C] | (mft[0x2D] << 8) | (mft[0x2E] << 16) | (mft[0x2F] << 21);
                 f->NTFS_Set_MFT(mft_header);
 
-                  //Doc attributes
+                //Doc attributes
                 int started_byte = mft_header.started_attribute_offset;
                 while (started_byte < mft_header.byte_used)
                 {
-                        
+
                     //Kich thuoc 1 attribute 
                     int size = mft[started_byte + 0x04] | (mft[started_byte + 0x05] << 8) | (mft[started_byte + 0x06] << 16) | (mft[started_byte + 0x07] << 24);
                     if (started_byte + size > mft_header.byte_used || size == 0)
@@ -129,7 +129,7 @@ void Computer::NTFS_Read_MFT(int ith_drive, std::wstring drivePath) {
                             f->setName(NTFS_Create_Name(attr, h));
                             int parentID = attr[x] | (attr[x + 1] << 8) | (attr[x + 2] << 16) | (attr[x + 3] << 24) | (attr[x + 4] << 32) | (attr[x + 5] << 40);
                             if (parentID == drive_id)
-                            {    
+                            {
                                 root_Drives[ith_drive]->addNewFile_Directory(f);
 
                             }
@@ -284,7 +284,7 @@ void Computer::NTFS_Read_MFT(int ith_drive, std::wstring drivePath) {
                     delete[] attr;
                 }
             }
-            
+
         }
         main_mft_offset_byte += (long long)vbr.byte_per_MFT_entry;
         cnt++;
@@ -348,7 +348,7 @@ int NTFS_Read_BITMAP(BYTE* attr, Header_Attribute h)
     std::copy(attr + h.attribute_data_offset, attr + h.attribute_data_offset + h.size_of_attribute, data_attr);
     for (long long i = h.size_of_attribute - 1; i >= 0; i--)
     {
-        if (data_attr[i] == 0x01) 
+        if (data_attr[i] == 0x01)
         {
             return i;
         }
@@ -394,7 +394,8 @@ std::string NTFS_Create_Name(BYTE* attr, Header_Attribute h)
     int length_name = data_attr[64];
     for (int i = 0; i < length_name * 2 - 1; i++)
     {
-        oss << std::hex << data_attr[66 + i];
+        if (data_attr[66 + i] != 0x00)
+            oss << std::hex << data_attr[66 + i];
     }
     std::string str = oss.str();
     delete[] data_attr;
