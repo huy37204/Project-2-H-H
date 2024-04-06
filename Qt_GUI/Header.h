@@ -101,6 +101,8 @@ public:
     void setName(std::string name) { this->name = name; }
     std::string getName() { return name; }
 
+    void setAttributes(std::string attributes) { this->attributes = attributes; }
+    std::string getAttributes() { return attributes; }
 
     void setTime(Time t) { this->time_created = t; }
     void setDate(Date d) { this->date_created = d; }
