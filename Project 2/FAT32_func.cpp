@@ -237,15 +237,7 @@ void FileSystemEntity::FAT32_Read_Next_Sector(Drive* dr, std::wstring drivePath)
     CloseHandle(hDrive);
 }
 
-void File::byteArrayToString()
-{
-    for (const auto& cluster : this->data) {
-        for (BYTE byte : cluster) {
-            if (byte != 0x00)
-                this->text.push_back(static_cast<char>(byte));
-        }
-    }
-}
+
 
 void File::FAT32_Read_Data(Drive* dr, std::wstring drivePath)
 {

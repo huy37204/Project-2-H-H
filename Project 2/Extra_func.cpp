@@ -29,3 +29,13 @@ std::wstring FileSystemEntity::stringToWstring(const std::string& str) {
 
     return wstr;
 }
+
+void File::byteArrayToString()
+{
+    for (const auto& cluster : this->data) {
+        for (BYTE byte : cluster) {
+            if (byte != 0x00)
+                this->text.push_back(static_cast<char>(byte));
+        }
+    }
+}
