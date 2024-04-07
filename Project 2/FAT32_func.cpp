@@ -241,7 +241,8 @@ void File::byteArrayToString()
 {
     for (const auto& cluster : this->data) {
         for (BYTE byte : cluster) {
-            this->text.push_back(static_cast<char>(byte));
+            if (byte != 0x00)
+                this->text.push_back(static_cast<char>(byte));
         }
     }
 }
