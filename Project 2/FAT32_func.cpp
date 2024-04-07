@@ -166,7 +166,6 @@ void Computer::FAT32_Read_RDET(int ith_drive, std::wstring drivePath)
                     newDirectory->setDate(d);
                     newDirectory->setTime(t);
                     newDirectory->add_cluster_pos(started_cluster);
-                    newDirectory->setTotalSize(total_size);
                     newDirectory->FAT32_Read_Next_Sector(root_Drives[ith_drive], drivePath);
                     newDirectory->setAttributes("Folder");
                     root_Drives[ith_drive]->addNewFile_Directory(newDirectory);
@@ -343,7 +342,6 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath)
                     newDirectory->setDate(d);
                     newDirectory->setTime(t);
                     newDirectory->add_cluster_pos(started_cluster);
-                    newDirectory->setTotalSize(total_size);
                     newDirectory->FAT32_Read_Next_Sector(dr, drivePath);
                     newDirectory->setAttributes("Folder");
                     this->addNewFile_Directory(newDirectory);
@@ -351,11 +349,6 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath)
                 extra_entry = std::vector <std::vector <BYTE>>{};
                 main_entry = std::vector <BYTE>{};
             }
-           /* else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] == 0xE5)
-            {
-                extra_entry.clear();
-                main_entry.clear();
-            }*/
             else
             {
                 extra_entry.clear();
@@ -368,129 +361,104 @@ void Directory::FAT32_ReadDirectoryData(Drive* dr, std::wstring drivePath)
     CloseHandle(hDrive);
 }
 
-void Computer::FAT32_Remove_File(int ith_drive, std::wstring drivePath, std::string name_file)
+
+
+void Drive::FAT32_Remove_File(std::wstring drivePath, std::string name_file, Computer& MyPC)
 {
- /*   HANDLE hDrive = CreateFileW(drivePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    for (int i = 0; i < rootDirectories_Files.size(); i++)
+    {
+        if (dynamic_cast<Directory*>(rootDirectories_Files[i]))
+        {
+            if (dynamic_cast<Directory*>(rootDirectories_Files[i])->FAT32_Remove_File(drivePath, name_file, this->fat32bs, MyPC))
+                return;
+        }
+    }
+}
+
+bool Directory::FAT32_Remove_File(std::wstring drivePath, std::string name_file, FAT32_BOOTSECTOR bs, Computer& MyPC)
+{
+    std::vector <int> pos_cluster;
+    FAT32_Get_Cluster_Pos(pos_cluster);
+    HANDLE hDrive = CreateFileW(drivePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if (hDrive == INVALID_HANDLE_VALUE) {
         std::cout << "Failed to open physical drive." << std::endl;
-        return;
-    }*/
-    HANDLE hDrive = CreateFileW(
-        drivePath.c_str(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,
-        0,
-        NULL
-    );
-
-    if (hDrive == INVALID_HANDLE_VALUE) {
-        std::cerr << "Failed to open drive: " << GetLastError() << std::endl;
-    }
-
-    DWORD bytesReturned;
-    if (!DeviceIoControl(
-        hDrive,
-        FSCTL_LOCK_VOLUME,
-        NULL,
-        0,
-        NULL,
-        0,
-        &bytesReturned,
-        NULL
-    )) {
-        std::cerr << "Failed to lock volume: " << GetLastError() << std::endl;
+        CloseHandle(hDrive);
+        return false;
     }
     DWORD bytesRead;
-    int bytes_read = 0;
-    bool is_end = 0;
-    while (!is_end)
+    int bytes_per_cluster = bs.byte_per_sector * bs.sector_per_cluster;
+    for (int i = 0; i < pos_cluster.size(); i++)
     {
-        SetFilePointer(hDrive, root_Drives[ith_drive]->getStartedByteRDET() + bytes_read, NULL, FILE_BEGIN);
-        bytes_read += 512;
-        BYTE rdet[512];
-        if (!ReadFile(hDrive, rdet, sizeof(rdet), &bytesRead, NULL)) {
+        int byte_cluster_pos = bs.byte_per_sector * (bs.sector_before_FAT_table + bs.num_of_FAT_tables * bs.sector_per_FAT + (pos_cluster[i] - bs.first_cluster_of_RDET) * bs.sector_per_cluster);
+        SetFilePointer(hDrive, byte_cluster_pos, NULL, FILE_BEGIN);
+        BYTE* data = new BYTE[bytes_per_cluster];
+        if (!ReadFile(hDrive, data, bytes_per_cluster, &bytesRead, NULL)) {
             std::wcerr << "Failed to read boot sector from physical drive." << std::endl;
             CloseHandle(hDrive);
-            return;
+            return false;
         }
-  
-        int count_extra_entry = 0; // Dem entry phu
-        int start_byte = 0; // Cho vong lap chay 32 byte cho moi vong lap
+        std::vector <BYTE> data_each_cluster; data_each_cluster.assign(data, data + bytes_per_cluster);
+        Push_Data(data_each_cluster);
+        int start_byte = 64; // Cho vong lap chay 32 byte cho moi vong lap
         std::vector <std::vector <BYTE>> extra_entry;
         std::vector <BYTE> main_entry;
-        while (start_byte < 512)
+        int count_extra_entry = 0;
+        while (start_byte < bytes_per_cluster)
         {
-            int attribute = rdet[start_byte + 0x0B]; //0-0-A-D-V-S-H-R
+            int attribute = data[start_byte + 0x0B]; //0-0-A-D-V-S-H-R
             if (attribute == 0x0F)
             {
                 count_extra_entry++;
                 std::vector<BYTE> temp_vec;
-                std::copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(temp_vec)); // Doc 32 byte vao entry phu
+                copy(&data[start_byte], &data[start_byte + 32], back_inserter(temp_vec)); // Doc 32 byte vao entry phu
                 extra_entry.push_back(temp_vec);
             }
-            else if ((attribute == 0x10 || attribute == 0x20) && rdet[start_byte] != 0xE5)
+            else if ((attribute == 0x10 || attribute == 0x20) && data[start_byte] != 0xE5)
             {
-                copy(&rdet[start_byte], &rdet[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
+                copy(&data[start_byte], &data[start_byte + 32], back_inserter(main_entry)); // Doc 32 byte vao entry chinh
                 std::string name = FAT32_Create_Name(extra_entry, main_entry);
                 name.erase(std::remove(name.begin(), name.end(), 0x00), name.end());
-                name.erase(std::remove(name.begin(), name.end(), '\0'), name.end());
-
                 if (name == name_file)
                 {
-                    int started_file_offset = start_byte - count_extra_entry * 32;
-                    for (int i = 0; i < (count_extra_entry + 1)*32; i+=32)
+                    int started_sdet_offset = start_byte - count_extra_entry * 32;
+                    std::vector <BYTE> started_byte;
+                    for (int i = 0; i < (count_extra_entry + 1) * 32; i += 32)
                     {
-                        rdet[started_file_offset + i] = 0xE5;
+                        started_byte.push_back(data[started_sdet_offset + i]);
+                        data[started_sdet_offset + i] = 0xE5;
                     }
-                    uint64_t offset = root_Drives[ith_drive]->getStartedByteRDET() + bytes_read - 512;
+                    MyPC.setMapSDET(started_byte, byte_cluster_pos, started_sdet_offset, name_file);
+                    uint64_t offset = byte_cluster_pos;
                     LARGE_INTEGER liOffset;
                     liOffset.QuadPart = offset;
                     if (!SetFilePointerEx(hDrive, liOffset, NULL, FILE_BEGIN))
                     {
                         std::cout << "Failed to point to offset\n";
                     }
-                    /*DWORD bytesReturn;
+                    DWORD bytesReturn;
                     if (!DeviceIoControl(hDrive, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0, &bytesReturn, NULL))
                     {
                         std::cout << "Failed to lock Drive\n";
                         DWORD error = GetLastError();
                         std::cout << "Error: " << error << std::endl;
-                    }*/
+                    }
 
                     DWORD bytesWritten;
-                    if (!WriteFile(hDrive, rdet, 512, &bytesWritten, NULL)) {
+                    if (!WriteFile(hDrive, data, 512, &bytesWritten, NULL)) {
                         DWORD lastError = GetLastError();
                         std::wcerr << "Failed to write to physical drive." << lastError << std::endl;
                         CloseHandle(hDrive);
-                        return;
+                        return true;
                     }
 
                     FlushFileBuffers(hDrive);
-
-                    if (!UnlockFile(hDrive, 0, 0, 512, 0)) {
-                        std::wcerr << "Failed to unlock the drive." << std::endl;
-                        CloseHandle(hDrive);
-                        return;
-                    }
+                    CloseHandle(hDrive);
+                    return true;
                 }
-                
-                extra_entry.clear();
-                main_entry.clear();
+                extra_entry = std::vector <std::vector <BYTE>>{};
+                main_entry = std::vector <BYTE>{};
             }
-            else if ((attribute == 0x10 || attribute == 0x20) && rdet[start_byte] == 0xE5)
-            {
-                count_extra_entry = 0;
-                extra_entry.clear();
-                main_entry.clear();
-            }
-            else if (attribute == 0x00)
-            {
-                is_end = 1;
-                break;
-            }
-            else 
+            else
             {
                 count_extra_entry = 0;
                 extra_entry.clear();
@@ -498,7 +466,18 @@ void Computer::FAT32_Remove_File(int ith_drive, std::wstring drivePath, std::str
             }
             start_byte += 32;
         }
+        delete[] data;
     }
     CloseHandle(hDrive);
- 
+
+    for (int i = 0; i < contents.size(); i++)
+    {
+        if (dynamic_cast<Directory*>(contents[i]))
+        {
+            if (dynamic_cast<Directory*>(contents[i])->FAT32_Remove_File(drivePath, name_file, bs, MyPC))
+                return true;
+        }
+    }
+    return false;
 }
+

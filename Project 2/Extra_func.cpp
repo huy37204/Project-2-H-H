@@ -21,3 +21,11 @@ int byteToTwosComplement(int byteValue) {
         return byteValue;
     }
 }
+std::wstring FileSystemEntity::stringToWstring(const std::string& str) {
+    std::locale loc(std::locale(), new std::codecvt_utf8<wchar_t>);
+    const std::ctype<wchar_t>& ct = std::use_facet<std::ctype<wchar_t>>(loc);
+    std::wstring wstr(str.length(), L' ');
+    ct.widen(str.data(), str.data() + str.length(), &wstr[0]);
+
+    return wstr;
+}

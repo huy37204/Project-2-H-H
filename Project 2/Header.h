@@ -9,11 +9,12 @@
 #include <sstream>
 #include <algorithm>
 #include <winioctl.h>
-
+#include <map>
+#include <codecvt>
 
 
 class Drive;
-
+class Computer;
 struct Date
 {
     int day, month, year;
@@ -84,15 +85,16 @@ protected:
     Date date_created;
     Time time_created;
     std::vector <int> cluster_pos;
-    long long total_size;
+    long long total_size = 0;
     std::vector <std::vector<BYTE>>data;
 
     NTFS_MFT mft;
     std::string text;
     NonResidentInfo nonresidentinfo;
 public:
-    FileSystemEntity() = default;
+    FileSystemEntity() {}
 
+    std::wstring stringToWstring(const std::string& str);
     void setAttributes(std::string attributes) { this->attributes = attributes; }
     std::string getAttributes() { return attributes; }
 
@@ -106,8 +108,6 @@ public:
     void add_cluster_pos(int pos) { cluster_pos.push_back(pos); }
     int get_pos_cluster(int index) { return cluster_pos[index]; }
 
-    void setTotalSize(long long size) { this->total_size = size; }
-    long long getTotalSize() { return total_size; }
 
     void Push_Data(std::vector<BYTE>DATA) { data.push_back(DATA); }
 
@@ -151,6 +151,9 @@ public:
         std::cout << std::endl;
         std::cout << text << std::endl;
     }
+    void setTotalSize(long long size) { this->total_size = size; }
+    long long getTotalSize() { return total_size; }
+
     void FAT32_Read_Next_Sector(Drive* dr, std::wstring drivePath)
     {
         FileSystemEntity::FAT32_Read_Next_Sector(dr, drivePath);
@@ -204,6 +207,20 @@ public:
         }
     }
 
+    long long getTotalSize() { 
+        for (int i = 0; i < contents.size(); i++)
+        {
+            if (dynamic_cast<Directory*>(contents[i]))
+            {
+                total_size += dynamic_cast<Directory*>(contents[i])->getTotalSize();
+            }
+            else
+            {
+                total_size += dynamic_cast<File*>(contents[i])->getTotalSize();
+            }
+        }
+        return total_size;
+    }
 
     void addNewFile_Directory(FileSystemEntity* f)
     {
@@ -246,6 +263,7 @@ public:
             }
         }
     }
+    bool FAT32_Remove_File(std::wstring drivePath, std::string name_file, FAT32_BOOTSECTOR bs, Computer& MyPC);
     ~Directory()
     {
         for (int i = 0; i < contents.size(); i++)
@@ -263,6 +281,7 @@ private:
     int started_byte_rdet;
     std::vector<FileSystemEntity*> rootDirectories_Files;
     FAT32_BOOTSECTOR fat32bs;
+    long long total_size;
 
     NTFS_VBR vbr;
 public:
@@ -331,6 +350,20 @@ public:
             }
         }
     }
+    void setToTalSize()
+    {
+        for (int i = 0; i < rootDirectories_Files.size(); i++)
+        {
+            if (dynamic_cast<Directory*>(rootDirectories_Files[i]))
+            {
+                total_size += dynamic_cast<Directory*>(rootDirectories_Files[i])->getTotalSize();
+            }
+            else
+            {
+                total_size += dynamic_cast<File*>(rootDirectories_Files[i])->getTotalSize();
+            }
+        }
+    }
     void readData(std::wstring drivePath)
     {
         for (int i = 0; i < rootDirectories_Files.size(); i++)
@@ -346,6 +379,7 @@ public:
             }
         }
     }
+
     void NTFS_Read_Data(std::wstring drivePath)
     {
 
@@ -362,6 +396,8 @@ public:
         }
     }
     Directory* NTFS_Find_Parent_Directory(int parent_id);
+
+    void FAT32_Remove_File(std::wstring drivePath, std::string name_file, Computer& MyPC);
     ~Drive()
     {
         for (int i = 0; i < rootDirectories_Files.size(); i++)
@@ -371,8 +407,29 @@ public:
 
 class Computer {
 private:
+    std::map<std::string, int> offset_recover_started_rdet_entry;
+    std::map<std::string, std::pair<int, int>> offset_recover_started_sdet_entry; // pair: .firt - offset cua file bi xoa trong sdet, .second - offset trong sdet
+    std::map<std::string, std::vector<BYTE>> started_byte_rdet_sdet;
     std::vector<Drive*> root_Drives;
 public:
+    void setMapRDET(std::vector<BYTE> started_byte, int offset, std::string name_file)
+    {
+        for (int i = 0; i < started_byte.size(); i++)
+        {
+            this->started_byte_rdet_sdet[name_file].push_back(started_byte[i]);
+        }
+        offset_recover_started_rdet_entry[name_file] = offset;
+    }
+    void setMapSDET(std::vector<BYTE> started_byte, int total_offset, int sdet_offset, std::string name_file)
+    {
+        for (int i = 0; i < started_byte.size(); i++)
+        {
+            this->started_byte_rdet_sdet[name_file].push_back(started_byte[i]);
+        }
+        offset_recover_started_sdet_entry[name_file].first = total_offset;
+        offset_recover_started_sdet_entry[name_file].second = sdet_offset;
+    }
+
     void addRootDrive(Drive*& d) {
         root_Drives.push_back(d);
     }
@@ -408,6 +465,7 @@ public:
         }
     }
     void FAT32_Remove_File(int ith_drive, std::wstring drivePath, std::string name_file);
+    void FAT32_Recover_File(int ith_drive, std::wstring drivePath, std::string name_file);
 };
 
 
