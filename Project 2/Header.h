@@ -94,7 +94,8 @@ protected:
 public:
     FileSystemEntity() {}
 
-    std::wstring stringToWstring(const std::string& str);
+    std::wstring utf8_to_wstring(const std::string& str);
+
     void setAttributes(std::string attributes) { this->attributes = attributes; }
     std::string getAttributes() { return attributes; }
 
